@@ -87,9 +87,7 @@
             "STORAGE_BUCKET": "chauffage-expert-files-staging"
         }
     },
-    "regions": ["cdg1"],
-    "cdn": {
-        "provider": "vercel",
-        "regions": ["cdg1", "fra1", "lhr1", "iad1", "sfo1"]
-    }
+    "regions": [
+        "cdg1"
+    ]
 }
