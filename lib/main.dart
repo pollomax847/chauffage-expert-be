@@ -42,7 +42,10 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/export',
-      builder: (context, state) => const ExportPage(),
+      builder: (context, state) => ExportPage(
+        typeExport: 'pdf',
+        titre: 'Exportation des données',
+      ),
     ),
     GoRoute(
       path: '/gestion-donnees',
