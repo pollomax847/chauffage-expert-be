@@ -3,12 +3,11 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  cloud_firestore
   connectivity_plus
-  firebase_auth
-  firebase_core
+  file_selector_windows
   geolocator_windows
   printing
+  share_plus
   syncfusion_pdfviewer_windows
   url_launcher_windows
 )
