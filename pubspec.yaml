@@ -34,6 +34,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.2
+  path_provider_platform_interface: ^2.0.6
   
   # Network
   http: ^1.1.2
@@ -87,6 +88,7 @@ dev_dependencies:
   json_serializable: ^6.7.1
   freezed: ^2.4.1
   test: ^1.24.9
+  mocktail: ^1.0.3
 
 flutter:
   uses-material-design: true
@@ -99,7 +101,7 @@ flutter:
     - family: Roboto
       fonts:
         - asset: assets/fonts/Roboto-Regular.ttf
-        - asset: assets/fonts/Roboto-Medium.ttf
-          weight: 500
         - asset: assets/fonts/Roboto-Bold.ttf
-          weight: 700 
+          weight: 700
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500 

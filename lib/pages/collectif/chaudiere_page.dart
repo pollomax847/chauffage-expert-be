@@ -1,3 +1,4 @@
+// pages/collectif/chaudiere_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/collectif_service.dart';
@@ -193,17 +194,17 @@ class _ChaudierePageState extends ConsumerState<ChaudierePage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Puissance de base : ${_resultat!['puissanceBase'].toStringAsFixed(1)} W/m²',
+                        'Puissance de base : ${(_resultat!['puissanceBase'] as num?)?.toStringAsFixed(1) ?? '0.0'} W/m²',
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Coefficient température : ${_resultat!['coefficientTemperature'].toStringAsFixed(1)}',
+                        'Coefficient température : ${(_resultat!['coefficientTemperature'] as num?)?.toStringAsFixed(1) ?? '0.0'}',
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Puissance totale recommandée : ${_resultat!['puissanceTotale'].toStringAsFixed(1)} kW',
+                        'Puissance totale recommandée : ${(_resultat!['puissanceTotale'] as num?)?.toStringAsFixed(1) ?? '0.0'} kW',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

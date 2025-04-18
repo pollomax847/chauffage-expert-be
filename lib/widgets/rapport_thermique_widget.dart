@@ -1,3 +1,4 @@
+// widgets/rapport_thermique_widget.dart
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import '../models/radiateur.dart';
@@ -8,7 +9,7 @@ class RapportThermiqueWidget extends StatelessWidget {
   final List<Radiateur> radiateurs;
 
   const RapportThermiqueWidget({Key? key, required this.radiateurs})
-    : super(key: key);
+      : super(key: key);
 
   Future<void> _genererEtTelechargerPDF(BuildContext context) async {
     try {
@@ -24,7 +25,7 @@ class RapportThermiqueWidget extends StatelessWidget {
         'date': DateTime.now().toLocal().toString().split(' ')[0],
       };
 
-      final pdf = await PdfService.genererRapportThermiquePDF(
+      final pdf = await PDFService.genererRapportThermiquePDF(
         radiateurs: radiateurs,
         entreprise: entreprise,
         client: client,
@@ -189,11 +190,10 @@ class RapportThermiqueWidget extends StatelessWidget {
                   rapport['puissanceSuffisante'] && rapport['materiauAdapte']
                       ? Icons.check_circle
                       : Icons.warning,
-                  color:
-                      rapport['puissanceSuffisante'] &&
-                              rapport['materiauAdapte']
-                          ? Colors.green
-                          : Colors.orange,
+                  color: rapport['puissanceSuffisante'] &&
+                          rapport['materiauAdapte']
+                      ? Colors.green
+                      : Colors.orange,
                 ),
               ],
             ),

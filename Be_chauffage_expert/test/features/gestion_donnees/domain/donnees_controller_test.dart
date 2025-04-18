@@ -1,8 +1,8 @@
-// test/features/gestion_donnees/domain/donnees_controller_test.dart
+// Be_chauffage_expert/test/features/gestion_donnees/domain/donnees_controller_test.dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:chauffage_expert/features/gestion_donnees/domain/donnees_repository.dart';
-import 'package:chauffage_expert/features/gestion_donnees/domain/donnees_controller.dart';
+import 'package:chauffage_expert/features/gestion_donnees/domain/repositories/donnees_repository.dart';
+import 'package:chauffage_expert/features/gestion_donnees/presentation/controllers/donnees_controller.dart';
 
 class MockDonneesRepository extends Mock implements DonneesRepository {}
 
@@ -57,7 +57,8 @@ void main() {
       when(mockRepository.modifierDonnee('test', 'nouvelle_valeur'))
           .thenAnswer((_) async => true);
 
-      final resultat = await controller.modifierDonnee('test', 'nouvelle_valeur');
+      final resultat =
+          await controller.modifierDonnee('test', 'nouvelle_valeur');
 
       expect(resultat, true);
       expect(controller.donnees['test'], 'nouvelle_valeur');
@@ -99,7 +100,7 @@ void main() {
 
       test('filtre les données selon la recherche', () {
         controller.setSearchQuery('test');
-        
+
         final resultat = controller.donneesFiltrees;
         expect(resultat.length, 1);
         expect(resultat['ghi'], 'test3');
@@ -117,4 +118,4 @@ void main() {
       });
     });
   });
-} 
+}

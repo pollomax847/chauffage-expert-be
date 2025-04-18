@@ -1,3 +1,4 @@
+// services/pdf_service.dart
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -5,6 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:excel/excel.dart';
+import 'package:get_it/get_it.dart';
+import '../features/gestion_donnees/domain/repositories/donnees_repository.dart';
 import '../models/radiateur.dart';
 import '../services/analyse_thermique_service.dart';
 import '../services/calcul_service.dart';
@@ -19,6 +22,8 @@ class PDFService {
     bool showPreview = false,
   }) async {
     final pdf = pw.Document();
+    final repository = GetIt.instance<DonneesRepository>();
+    final logoPath = await repository.getLogoPath();
 
     // En-tête personnalisé
     pdf.addPage(
@@ -28,7 +33,10 @@ class PDFService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              _buildHeader(entete),
+              _buildHeader({
+                ...?entete,
+                if (logoPath != null) 'logoPath': logoPath,
+              }),
               pw.SizedBox(height: 20),
               _buildTitle(typeCalcul),
               pw.SizedBox(height: 20),
@@ -55,6 +63,8 @@ class PDFService {
     required String typeBE,
   }) async {
     final pdf = pw.Document();
+    final repository = GetIt.instance<DonneesRepository>();
+    final logoPath = await repository.getLogoPath();
 
     pdf.addPage(
       pw.Page(
@@ -63,7 +73,9 @@ class PDFService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader({
+                if (logoPath != null) 'logoPath': logoPath,
+              }),
               pw.SizedBox(height: 20),
               _buildTitle('Bureau d\'Étude - $typeBE'),
               pw.SizedBox(height: 20),
@@ -82,6 +94,8 @@ class PDFService {
     required String typeInstallation,
   }) async {
     final pdf = pw.Document();
+    final repository = GetIt.instance<DonneesRepository>();
+    final logoPath = await repository.getLogoPath();
 
     pdf.addPage(
       pw.Page(
@@ -90,7 +104,9 @@ class PDFService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader({
+                if (logoPath != null) 'logoPath': logoPath,
+              }),
               pw.SizedBox(height: 20),
               _buildTitle('Rapport Complet - $typeInstallation'),
               pw.SizedBox(height: 20),
@@ -131,7 +147,7 @@ class PDFService {
     data.forEach((key, value) {
       if (value is Map) {
         sheet.appendRow([key]);
-        _addDataToExcel(sheet, value);
+        _addDataToExcel(sheet, value as Map<String, dynamic>);
       } else {
         sheet.appendRow([key, value.toString()]);
       }
@@ -145,11 +161,11 @@ class PDFService {
         color: PdfColors.blue100,
         borderRadius: pw.BorderRadius.circular(10),
       ),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text(
                 entete?['titre'] ?? 'Chauffage Expert',
@@ -158,19 +174,33 @@ class PDFService {
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
+              if (entete?['sousTitre'] != null) ...[
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  entete!['sousTitre']!,
+                  style: const pw.TextStyle(fontSize: 14),
+                ),
+              ],
+            ],
+          ),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.end,
+            children: [
+              if (entete?['logoPath'] != null) ...[
+                pw.Image(
+                  pw.MemoryImage(
+                    File(entete!['logoPath']!).readAsBytesSync(),
+                  ),
+                  height: 50,
+                ),
+                pw.SizedBox(height: 8),
+              ],
               pw.Text(
                 DateFormat('dd/MM/yyyy').format(DateTime.now()),
                 style: const pw.TextStyle(fontSize: 12),
               ),
             ],
           ),
-          if (entete?['sousTitre'] != null) ...[
-            pw.SizedBox(height: 8),
-            pw.Text(
-              entete!['sousTitre']!,
-              style: const pw.TextStyle(fontSize: 14),
-            ),
-          ],
         ],
       ),
     );

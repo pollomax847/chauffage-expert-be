@@ -1,3 +1,4 @@
+// pages/be/geothermie/sondes_geothermiques_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../services/be_geothermie.dart';
@@ -32,9 +33,8 @@ class _SondesGeothermiquesPageState
     if (_formKey.currentState!.validate()) {
       final resultats = BEGeothermie.dimensionnerSondesGeothermiques(
         puissanceThermique: double.parse(_puissanceController.text),
-        temperatureSource: double.parse(_temperatureSourceController.text),
-        temperatureEmise: double.parse(_temperatureEmiseController.text),
         profondeur: double.parse(_profondeurController.text),
+        conductiviteThermique: 2.0, // Valeur standard pour le sol
       );
       setState(() => _resultats = resultats);
     }

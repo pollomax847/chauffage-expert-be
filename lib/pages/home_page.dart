@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/theme_card.dart';
 import '../features/gestion_donnees/presentation/widgets/gestion_donnees_widget.dart';
+import 'preferences_page.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -17,7 +18,12 @@ class HomePage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // TODO: Naviguer vers les paramètres
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PreferencesPage(),
+                ),
+              );
             },
           ),
         ],

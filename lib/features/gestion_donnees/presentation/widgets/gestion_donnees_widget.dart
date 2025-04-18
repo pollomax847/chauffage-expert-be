@@ -13,7 +13,6 @@ class GestionDonneesWidget extends StatefulWidget {
 class _GestionDonneesWidgetState extends State<GestionDonneesWidget> {
   final _repository = GetIt.instance<DonneesRepository>();
   Map<String, dynamic> _donnees = {};
-  List<Map<String, dynamic>> _historique = [];
 
   @override
   void initState() {
@@ -22,21 +21,16 @@ class _GestionDonneesWidgetState extends State<GestionDonneesWidget> {
   }
 
   Future<void> _chargerDonnees() async {
-    final donnees = await _repository.chargerDonnees();
-    final historique = await _repository.obtenirHistorique();
+    final donnees = await _repository.getDonnees();
     setState(() {
       _donnees = donnees;
-      _historique = historique;
     });
   }
 
   Future<void> _sauvegarderDonnees() async {
-    final nouvellesDonnees = {
-      'id': DateTime.now().millisecondsSinceEpoch.toString(),
-      'timestamp': DateTime.now().toIso8601String(),
-      'donnees': _donnees,
-    };
-    await _repository.sauvegarderDonnees(nouvellesDonnees);
+    for (final entry in _donnees.entries) {
+      await _repository.ajouterDonnee(entry.key, entry.value);
+    }
     await _chargerDonnees();
   }
 
@@ -63,44 +57,6 @@ class _GestionDonneesWidgetState extends State<GestionDonneesWidget> {
                 ElevatedButton(
                   onPressed: _sauvegarderDonnees,
                   child: const Text('Sauvegarder'),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Historique',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _historique.length,
-                  itemBuilder: (context, index) {
-                    final entree = _historique[index];
-                    return ListTile(
-                      title: Text('Entrée ${index + 1}'),
-                      subtitle: Text(entree['timestamp']),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () async {
-                          await _repository.supprimerDonnees(entree['id']);
-                          await _chargerDonnees();
-                        },
-                      ),
-                    );
-                  },
                 ),
               ],
             ),

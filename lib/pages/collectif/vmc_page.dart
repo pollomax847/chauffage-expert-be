@@ -1,3 +1,4 @@
+// pages/collectif/vmc_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/be_vmc.dart';
@@ -51,8 +52,7 @@ class _VMCPageState extends ConsumerState<VMCPage> {
                 double.parse(_resultatPertes!['pertesTotales']);
             _resultatPuissance = BEVMC.calculerPuissanceVentilateur(
               debit: debitTotal,
-              pertesCharge: pertesTotales,
-              rendement: _rendement,
+              perteCharge: pertesTotales,
             );
           }
         }

@@ -84,7 +84,8 @@ class BEValidationService {
         parameters: parameters,
       )) {
         resultats['valide'] = false;
-        resultats['erreurs']!.add('Paramètres manquants pour le module $module');
+        (resultats['erreurs'] as List<String>)
+            .add('Paramètres manquants pour le module $module');
         return resultats;
       }
 
@@ -108,9 +109,11 @@ class BEValidationService {
                 );
                 if (!validation['valide']) {
                   resultats['valide'] = false;
-                  resultats['erreurs'].add(validation['message']);
+                  (resultats['erreurs'] as List<String>)
+                      .add(validation['message']);
                 } else if (validation['avertissement'] != null) {
-                  resultats['avertissements'].add(validation['avertissement']);
+                  (resultats['avertissements'] as List<String>)
+                      .add(validation['avertissement']);
                 }
               }
             }
@@ -121,7 +124,7 @@ class BEValidationService {
       // Journalisation des résultats de validation
       await BESecurityService.logSecurityEvent(
         'validation',
-        'Validation du module $module: ${resultats['valide'] ? 'succès' : 'échec'}',
+        'Validation du module $module: ${(resultats['valide'] as bool) ? 'succès' : 'échec'}',
       );
 
       return resultats;
@@ -131,7 +134,8 @@ class BEValidationService {
         'Erreur lors de la validation: $e',
       );
       resultats['valide'] = false;
-      resultats['erreurs'].add('Erreur lors de la validation: $e');
+      (resultats['erreurs'] as List<String>)
+          .add('Erreur lors de la validation: $e');
       return resultats;
     }
   }

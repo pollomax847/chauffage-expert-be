@@ -1,3 +1,4 @@
+// services/collectif_service.dart
 import 'dart:math';
 
 class CollectifService {
@@ -322,6 +323,45 @@ class CollectifService {
       'debitTotal': debitTotal,
       'puissanceVentilateur': puissanceVentilateur,
       'consommationAnnuelle': consommationAnnuelle,
+    };
+  }
+
+  static Map<String, double> dimensionnerPompesCirculation({
+    required double debitVolumique,
+    required double hauteurManometrique,
+    required double longueurReseau,
+    required double pertesLineaires,
+  }) {
+    final pertesCharge = (pertesLineaires * longueurReseau) / 100;
+    final hauteurTotale = hauteurManometrique + (pertesCharge * 10.2);
+    final puissanceHydraulique = (debitVolumique * hauteurTotale * 9.81) / 3600;
+    final puissanceAbsorbee = puissanceHydraulique / 0.7;
+    final vitesseRotation = 1450.0;
+
+    return {
+      'pertesCharge': pertesCharge,
+      'hauteurTotale': hauteurTotale,
+      'puissanceHydraulique': puissanceHydraulique,
+      'puissanceAbsorbee': puissanceAbsorbee,
+      'vitesseRotation': vitesseRotation,
+    };
+  }
+
+  static Map<String, double> dimensionnerPompesSurpression({
+    required double debitTotal,
+    required double hauteurTotale,
+    required double pressionMinimale,
+  }) {
+    final pressionTotale = pressionMinimale + (hauteurTotale * 0.1);
+    final puissanceHydraulique = (debitTotal * pressionTotale * 0.1) / 3.6;
+    final puissanceAbsorbee = puissanceHydraulique / 0.7;
+    final vitesseRotation = 1450.0;
+
+    return {
+      'pressionTotale': pressionTotale,
+      'puissanceHydraulique': puissanceHydraulique,
+      'puissanceAbsorbee': puissanceAbsorbee,
+      'vitesseRotation': vitesseRotation,
     };
   }
 }

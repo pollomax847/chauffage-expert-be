@@ -10,7 +10,7 @@ class DonneesModule {
 
     // Repository
     getIt.registerLazySingleton<DonneesRepository>(
-      () => DonneesRepositoryImpl(getIt<SharedPreferences>()),
+      () => DonneesRepositoryImpl(prefs: getIt<SharedPreferences>()),
     );
   }
-} 
+}

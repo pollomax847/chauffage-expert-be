@@ -1,3 +1,4 @@
+// pages/chauffage_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/be_chauffage.dart';
@@ -12,7 +13,6 @@ class ChauffagePage extends ConsumerStatefulWidget {
 class _ChauffagePageState extends ConsumerState<ChauffagePage> {
   final _formKey = GlobalKey<FormState>();
   double _surface = 0;
-  int _nombreLogements = 0;
   double _hauteurSousPlafond = 2.5;
   double _coefficientIsolation = 1.0;
   Map<String, dynamic>? _resultats;
@@ -57,22 +57,6 @@ class _ChauffagePageState extends ConsumerState<ChauffagePage> {
                         },
                         onSaved: (value) {
                           _surface = double.parse(value!);
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Nombre de logements',
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Veuillez entrer un nombre de logements';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          _nombreLogements = int.parse(value!);
                         },
                       ),
                       const SizedBox(height: 8),
@@ -125,10 +109,9 @@ class _ChauffagePageState extends ConsumerState<ChauffagePage> {
                             _formKey.currentState!.save();
                             setState(() {
                               _resultats = BEChauffage.calculerPuissance(
-                                surface: _surface,
-                                nombreLogements: _nombreLogements,
-                                hauteurSousPlafond: _hauteurSousPlafond,
-                                coefficientIsolation: _coefficientIsolation,
+                                deperditions:
+                                    _surface * _coefficientIsolation * 100,
+                                coefficientSecurite: 1.2,
                               );
                             });
                           }

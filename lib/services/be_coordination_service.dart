@@ -1,3 +1,4 @@
+// services/be_coordination_service.dart
 import 'dart:async';
 import 'be_chauffage.dart';
 import 'be_hydraulique.dart';
@@ -6,11 +7,9 @@ import 'be_geothermie.dart';
 import 'be_regulation.dart';
 import 'be_alimentation.dart';
 import 'be_evacuation.dart';
-import 'be_service.dart';
 import 'be_cache_service.dart';
 import 'be_notification_service.dart';
 import 'be_validation_service.dart';
-import 'be_logging_service.dart';
 import 'be_security_service.dart';
 import 'be_database_service.dart';
 import 'be_monitoring_service.dart';
@@ -20,7 +19,7 @@ class BECoordinationService {
   static final Map<String, dynamic> _calculsEnCours = {};
   static final Map<String, Completer<dynamic>> _completers = {};
   static final Map<String, DateTime> _derniersCalculs = {};
-  static const Duration _dureeValidite = Duration(minutes: 30);
+  static final _notificationService = BENotificationService();
 
   static Future<Map<String, dynamic>> calculer(
     String module,
@@ -36,11 +35,12 @@ class BECoordinationService {
       );
 
       if (!validation['valide']) {
-        throw Exception('Validation échouée: ${validation['erreurs'].join(', ')}');
+        throw Exception(
+            'Validation échouée: ${validation['erreurs'].join(', ')}');
       }
 
       if (validation['avertissements'].isNotEmpty) {
-        await BENotificationService.notify(
+        await _notificationService.notify(
           type: 'avertissement',
           message: 'Avertissements de validation',
           data: {
@@ -110,7 +110,7 @@ class BECoordinationService {
 
         // Notification si nécessaire
         if (_estResultatImportant(module, resultat)) {
-          await BENotificationService.notify(
+          await _notificationService.notify(
             type: 'important',
             message: 'Un résultat important a été calculé',
             data: {
@@ -203,14 +203,16 @@ class BECoordinationService {
     }
   }
 
-  static String _genererCleCache(String module, Map<String, dynamic> parametres) {
+  static String _genererCleCache(
+      String module, Map<String, dynamic> parametres) {
     final parametresTries = Map.fromEntries(
       parametres.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
     );
     return '$module:${BESecurityService.hashData(parametresTries)}';
   }
 
-  static bool _estResultatImportant(String module, Map<String, dynamic> resultat) {
+  static bool _estResultatImportant(
+      String module, Map<String, dynamic> resultat) {
     switch (module) {
       case 'chauffage':
         return resultat['puissance'] > 10000;
@@ -252,7 +254,7 @@ class BECoordinationService {
 
     // Notification si les déperditions sont élevées
     if (double.parse(deperditions['deperditionsTotales']) > 10000) {
-      BENotificationService.notify(
+      _notificationService.notify(
         type: 'alerte',
         message: 'Les déperditions thermiques sont supérieures à 10 kW',
         data: {
@@ -365,7 +367,7 @@ class BECoordinationService {
     };
 
     // Notification de fin de calcul
-    BENotificationService.notify(
+    _notificationService.notify(
       type: 'calcul',
       message: 'Tous les calculs ont été effectués avec succès',
       data: {

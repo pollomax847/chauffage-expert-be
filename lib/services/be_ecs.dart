@@ -1,3 +1,4 @@
+// services/be_ecs.dart
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 
@@ -78,6 +79,38 @@ class BEECS {
       'pertesSingulieres': pertesSingulieres.toStringAsFixed(2),
       'pertesTotales': pertesTotales.toStringAsFixed(2),
       'vitesse': vitesse.toStringAsFixed(2),
+    };
+  }
+
+  // Calcul du débit total
+  static Map<String, dynamic> calculerDebitTotal({
+    required int nombreLogements,
+    required int nombreEtages,
+    required int nombrePointsEau,
+  }) {
+    // Débit unitaire par point d'eau (L/s)
+    const double debitUnitaire = 0.2;
+
+    // Coefficient de simultanéité
+    final coefficientSimultaneite = 0.7;
+
+    // Calcul du débit total
+    final debitTotal = nombreLogements *
+        nombrePointsEau *
+        debitUnitaire *
+        coefficientSimultaneite;
+
+    // Calcul du diamètre recommandé
+    String diametre = '12';
+    if (debitTotal > 0.5) diametre = '16';
+    if (debitTotal > 1.0) diametre = '20';
+    if (debitTotal > 2.0) diametre = '25';
+
+    return {
+      'debitTotal': debitTotal.toStringAsFixed(2),
+      'diametre': diametre,
+      'coefficientSimultaneite': coefficientSimultaneite.toStringAsFixed(2),
+      'nombrePointsTotal': (nombreLogements * nombrePointsEau).toString(),
     };
   }
 }

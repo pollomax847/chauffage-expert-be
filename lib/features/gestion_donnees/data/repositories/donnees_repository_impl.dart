@@ -3,42 +3,57 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/repositories/donnees_repository.dart';
 
 class DonneesRepositoryImpl implements DonneesRepository {
-  final SharedPreferences _prefs;
-  static const String _keyDonnees = 'donnees';
-  static const String _keyHistorique = 'historique';
+  final SharedPreferences prefs;
 
-  DonneesRepositoryImpl(this._prefs);
+  DonneesRepositoryImpl({required this.prefs});
 
   @override
-  Future<void> sauvegarderDonnees(Map<String, dynamic> donnees) async {
-    await _prefs.setString(_keyDonnees, donnees.toString());
-    await _ajouterAHistorique(donnees);
+  Future<Map<String, dynamic>> getDonnees() async {
+    final keys = prefs.getKeys();
+    final result = <String, dynamic>{};
+    for (final key in keys) {
+      result[key] = prefs.get(key);
+    }
+    return result;
   }
 
   @override
-  Future<Map<String, dynamic>> chargerDonnees() async {
-    final donneesString = _prefs.getString(_keyDonnees);
-    if (donneesString == null) return {};
-    return Map<String, dynamic>.from(donneesString as Map);
+  Future<bool> ajouterDonnee(String cle, dynamic valeur) async {
+    if (valeur is String) {
+      return prefs.setString(cle, valeur);
+    } else if (valeur is int) {
+      return prefs.setInt(cle, valeur);
+    } else if (valeur is double) {
+      return prefs.setDouble(cle, valeur);
+    } else if (valeur is bool) {
+      return prefs.setBool(cle, valeur);
+    }
+    return false;
   }
 
   @override
-  Future<void> supprimerDonnees(String id) async {
-    final historique = await obtenirHistorique();
-    historique.removeWhere((element) => element['id'] == id);
-    await _prefs.setString(_keyHistorique, historique.toString());
+  Future<bool> modifierDonnee(String cle, dynamic valeur) async {
+    return ajouterDonnee(cle, valeur);
   }
 
   @override
-  Future<List<Map<String, dynamic>>> obtenirHistorique() async {
-    final historiqueString = _prefs.getString(_keyHistorique);
-    if (historiqueString == null) return [];
-    return List<Map<String, dynamic>>.from(historiqueString as List);
+  Future<bool> supprimerDonnee(String cle) async {
+    return prefs.remove(cle);
   }
 
-  Future<void> _ajouterAHistorique(Map<String, dynamic> donnees) async {
-    final historique = await obtenirHistorique();
-    historique.add(donnees);
-    await _prefs.setString(_keyHistorique, historique.toString());
+  // Gestion du logo
+  @override
+  Future<String?> getLogoPath() async {
+    return prefs.getString('logo_path');
+  }
+
+  @override
+  Future<bool> setLogoPath(String path) async {
+    return prefs.setString('logo_path', path);
+  }
+
+  @override
+  Future<bool> removeLogo() async {
+    return prefs.remove('logo_path');
   }
 }
