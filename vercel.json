@@ -76,16 +76,9 @@
         }
     ],
     "env": {
-        "production": {
-            "APP_ENV": "production",
-            "API_URL": "https://api.chauffage-expert.com",
-            "STORAGE_BUCKET": "chauffage-expert-files-prod"
-        },
-        "staging": {
-            "APP_ENV": "staging",
-            "API_URL": "https://api.staging.chauffage-expert.com",
-            "STORAGE_BUCKET": "chauffage-expert-files-staging"
-        }
+        "APP_ENV": "production",
+        "API_URL": "https://api.chauffage-expert.com",
+        "STORAGE_BUCKET": "chauffage-expert-files-prod"
     },
     "regions": [
         "cdg1"
