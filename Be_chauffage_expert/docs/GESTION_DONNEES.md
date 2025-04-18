@@ -1,0 +1,1 @@
+static const String dbName = 'chauffage_expert.db'; 

@@ -1,0 +1,95 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "build/web/**",
+            "use": "@vercel/static"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/build/web/index.html"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                },
+                {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                },
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "Referrer-Policy",
+                    "value": "strict-origin-when-cross-origin"
+                },
+                {
+                    "key": "Strict-Transport-Security",
+                    "value": "max-age=31536000; includeSubDomains; preload"
+                }
+            ]
+        },
+        {
+            "source": "/assets/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        },
+        {
+            "source": "/(.*).(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        }
+    ],
+    "redirects": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://api.chauffage-expert.com/:path*",
+            "permanent": true
+        },
+        {
+            "source": "/docs",
+            "destination": "https://docs.chauffage-expert.com",
+            "permanent": true
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/build/web/index.html"
+        }
+    ],
+    "env": {
+        "production": {
+            "APP_ENV": "production",
+            "API_URL": "https://api.chauffage-expert.com",
+            "STORAGE_BUCKET": "chauffage-expert-files-prod"
+        },
+        "staging": {
+            "APP_ENV": "staging",
+            "API_URL": "https://api.staging.chauffage-expert.com",
+            "STORAGE_BUCKET": "chauffage-expert-files-staging"
+        }
+    },
+    "regions": ["cdg1"],
+    "cdn": {
+        "provider": "vercel",
+        "regions": ["cdg1", "fra1", "lhr1", "iad1", "sfo1"]
+    }
+}

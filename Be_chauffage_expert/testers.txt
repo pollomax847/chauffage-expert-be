@@ -1,0 +1,13 @@
+# Liste des testeurs
+# Format: email, nom, groupe
+# Groupe: testers ou beta-testers
+
+# Testeurs principaux
+testeur1@example.com, Testeur Principal, testers
+testeur2@example.com, Testeur Secondaire, testers
+
+# Testeurs bêta
+beta1@example.com, Testeur Bêta 1, beta-testers
+beta2@example.com, Testeur Bêta 2, beta-testers
+
+memo.chaudiere@gmail.com 

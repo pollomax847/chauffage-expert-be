@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Monitoring Chauffage Expert</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-ok {
+            background-color: #4CAF50;
+        }
+
+        .status-warning {
+            background-color: #FFC107;
+        }
+
+        .status-error {
+            background-color: #F44336;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .offline-mode {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .offline-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .offline {
+            background-color: #FFC107;
+        }
+
+        .online {
+            background-color: #4CAF50;
+        }
+
+        .preferences {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-message {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .preferences-form {
+            display: none;
+            margin-top: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .preferences-section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .preferences-section:last-child {
+            border-bottom: none;
+        }
+
+        .preferences-section h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .color-picker label {
+            width: 120px;
+        }
+
+        .color-picker input[type="color"] {
+            width: 50px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+        }
+
+        .language-selector {
+            margin: 5px 0;
+        }
+
+        .language-selector select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 50px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .font-picker {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .font-picker label {
+            width: 120px;
+        }
+
+        .font-picker select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .font-size-picker {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .font-size-picker label {
+            width: 120px;
+        }
+
+        .font-size-picker input {
+            width: 100%;
+        }
+
+        .chart-style-picker {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .chart-style-picker label {
+            width: 120px;
+        }
+
+        .chart-style-picker select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .chart-preview {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .theme-presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .theme-preset {
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-align: center;
+        }
+
+        .theme-preset:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-preview-colors {
+            display: flex;
+            height: 20px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .theme-color {
+            flex: 1;
+        }
+
+        .theme-name {
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .theme-description {
+            font-size: 0.8em;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="preferences">
+        <button onclick="togglePreferences()" id="preferences-toggle">Préférences</button>
+        <div id="preferences-form" class="preferences-form">
+            <div class="preferences-section">
+                <h3>Profil</h3>
+                <input type="text" id="prenom" placeholder="Votre prénom">
+            </div>
+
+            <div class="preferences-section">
+                <h3>Thème</h3>
+                <div class="color-picker">
+                    <label>Couleur principale:</label>
+                    <input type="color" id="primary-color" value="#4CAF50">
+                </div>
+                <div class="color-picker">
+                    <label>Couleur secondaire:</label>
+                    <input type="color" id="secondary-color" value="#2196F3">
+                </div>
+                <div class="color-picker">
+                    <label>Couleur de fond:</label>
+                    <input type="color" id="background-color" value="#f5f5f5">
+                </div>
+                <div class="theme-preview" id="theme-preview"></div>
+            </div>
+
+            <div class="preferences-section">
+                <h3>Thèmes prédéfinis</h3>
+                <div class="theme-presets">
+                    <div class="theme-preset" onclick="applyThemePreset('classique')">
+                        <div class="theme-preview-colors">
+                            <div class="theme-color" style="background: #4CAF50;"></div>
+                            <div class="theme-color" style="background: #2196F3;"></div>
+                            <div class="theme-color" style="background: #f5f5f5;"></div>
+                        </div>
+                        <div class="theme-name">Classique</div>
+                        <div class="theme-description">Vert et bleu</div>
+                    </div>
+
+                    <div class="theme-preset" onclick="applyThemePreset('professionnel')">
+                        <div class="theme-preview-colors">
+                            <div class="theme-color" style="background: #2C3E50;"></div>
+                            <div class="theme-color" style="background: #3498DB;"></div>
+                            <div class="theme-color" style="background: #ECF0F1;"></div>
+                        </div>
+                        <div class="theme-name">Professionnel</div>
+                        <div class="theme-description">Bleu marine et gris</div>
+                    </div>
+
+                    <div class="theme-preset" onclick="applyThemePreset('sombre')">
+                        <div class="theme-preview-colors">
+                            <div class="theme-color" style="background: #1A1A1A;"></div>
+                            <div class="theme-color" style="background: #FF6B6B;"></div>
+                            <div class="theme-color" style="background: #2D2D2D;"></div>
+                        </div>
+                        <div class="theme-name">Sombre</div>
+                        <div class="theme-description">Noir et rouge</div>
+                    </div>
+
+                    <div class="theme-preset" onclick="applyThemePreset('nature')">
+                        <div class="theme-preview-colors">
+                            <div class="theme-color" style="background: #2ECC71;"></div>
+                            <div class="theme-color" style="background: #F1C40F;"></div>
+                            <div class="theme-color" style="background: #E8F5E9;"></div>
+                        </div>
+                        <div class="theme-name">Nature</div>
+                        <div class="theme-description">Vert et jaune</div>
+                    </div>
+
+                    <div class="theme-preset" onclick="applyThemePreset('minimaliste')">
+                        <div class="theme-preview-colors">
+                            <div class="theme-color" style="background: #666666;"></div>
+                            <div class="theme-color" style="background: #999999;"></div>
+                            <div class="theme-color" style="background: #FFFFFF;"></div>
+                        </div>
+                        <div class="theme-name">Minimaliste</div>
+                        <div class="theme-description">Nuances de gris</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preferences-section">
+                <h3>Langue</h3>
+                <div class="language-selector">
+                    <select id="language">
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="preferences-section">
+                <h3>Polices</h3>
+                <div class="font-picker">
+                    <label>Police principale:</label>
+                    <select id="main-font">
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                        <option value="'Lato', sans-serif">Lato</option>
+                    </select>
+                </div>
+                <div class="font-size-picker">
+                    <label>Taille du texte:</label>
+                    <input type="range" id="font-size" min="12" max="24" value="16">
+                    <span id="font-size-value">16px</span>
+                </div>
+            </div>
+
+            <div class="preferences-section">
+                <h3>Graphiques</h3>
+                <div class="chart-style-picker">
+                    <label>Style des graphiques:</label>
+                    <select id="chart-style">
+                        <option value="default">Classique</option>
+                        <option value="minimal">Minimaliste</option>
+                        <option value="dark">Sombre</option>
+                        <option value="colorful">Coloré</option>
+                    </select>
+                </div>
+                <div class="chart-style-picker">
+                    <label>Type de courbe:</label>
+                    <select id="chart-line-style">
+                        <option value="straight">Droite</option>
+                        <option value="smooth">Lissée</option>
+                        <option value="stepped">Échelonnée</option>
+                    </select>
+                </div>
+                <div class="chart-preview" id="chart-preview"></div>
+            </div>
+
+            <button onclick="savePreferences()">Enregistrer</button>
+        </div>
+    </div>
+
+    <div class="welcome-message" id="welcome-message"></div>
+
+    <div class="offline-mode">
+        <div id="connection-status" class="offline-indicator offline"></div>
+        <span id="connection-text">Mode hors ligne</span>
+        <button onclick="toggleOfflineMode()" id="offline-toggle">Activer mode hors ligne</button>
+    </div>
+
+    <div class="dashboard">
+        <!-- Statut général -->
+        <div class="card">
+            <h2>Statut général</h2>
+            <div class="status">
+                <div class="status-dot" id="global-status"></div>
+                <span id="global-status-text">Chargement...</span>
+            </div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value" id="uptime">0%</div>
+                    <div class="metric-label">Disponibilité</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="response-time">0ms</div>
+                    <div class="metric-label">Temps de réponse</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance -->
+        <div class="card">
+            <h2>Performance</h2>
+            <canvas id="performance-chart"></canvas>
+        </div>
+
+        <!-- Erreurs -->
+        <div class="card">
+            <h2>Erreurs</h2>
+            <canvas id="errors-chart"></canvas>
+        </div>
+
+        <!-- Tests de charge -->
+        <div class="card">
+            <h2>Tests de charge</h2>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value" id="load-users">0</div>
+                    <div class="metric-label">Utilisateurs simultanés</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="load-requests">0</div>
+                    <div class="metric-label">Requêtes/s</div>
+                </div>
+            </div>
+            <canvas id="load-chart"></canvas>
+        </div>
+
+        <!-- Récupération -->
+        <div class="card">
+            <h2>Récupération automatique</h2>
+            <div class="status">
+                <div class="status-dot" id="recovery-status"></div>
+                <span id="recovery-status-text">En attente...</span>
+            </div>
+            <div id="recovery-log"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration des graphiques
+        const performanceCtx = document.getElementById('performance-chart').getContext('2d');
+        const errorsCtx = document.getElementById('errors-chart').getContext('2d');
+        const loadCtx = document.getElementById('load-chart').getContext('2d');
+
+        // Configuration du mode hors ligne
+        let isOffline = false;
+        let localData = {
+            performance: [],
+            errors: [],
+            load: [],
+            status: 'ok',
+            uptime: 100,
+            responseTime: 0,
+            loadTest: {
+                users: 0,
+                requestsPerSecond: 0
+            },
+            recovery: {
+                status: 'ok',
+                log: []
+            }
+        };
+
+        // Fonction pour basculer le mode hors ligne
+        function toggleOfflineMode() {
+            isOffline = !isOffline;
+            const button = document.getElementById('offline-toggle');
+            const status = document.getElementById('connection-status');
+            const text = document.getElementById('connection-text');
+
+            if (isOffline) {
+                button.textContent = 'Désactiver mode hors ligne';
+                status.className = 'offline-indicator offline';
+                text.textContent = 'Mode hors ligne';
+                // Sauvegarder les données actuelles
+                localStorage.setItem('monitoringData', JSON.stringify(localData));
+            } else {
+                button.textContent = 'Activer mode hors ligne';
+                status.className = 'offline-indicator online';
+                text.textContent = 'Mode en ligne';
+                // Restaurer les données en ligne
+                updateDashboard();
+            }
+        }
+
+        // Fonction pour générer des données simulées
+        function generateMockData() {
+            return {
+                performance: Array.from({ length: 10 }, () => Math.random() * 100),
+                errors: Array.from({ length: 5 }, () => Math.floor(Math.random() * 10)),
+                load: {
+                    users: Math.floor(Math.random() * 100),
+                    requestsPerSecond: Math.floor(Math.random() * 50)
+                },
+                status: Math.random() > 0.1 ? 'ok' : 'warning',
+                uptime: 100 - Math.random() * 5,
+                responseTime: Math.floor(Math.random() * 500),
+                recovery: {
+                    status: 'ok',
+                    log: ['Dernière vérification: ' + new Date().toLocaleTimeString()]
+                }
+            };
+        }
+
+        // Graphique de performance
+        new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Temps de réponse (ms)',
+                    data: [],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Graphique d'erreurs
+        new Chart(errorsCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Nombre d\'erreurs',
+                    data: [],
+                    backgroundColor: 'rgb(255, 99, 132)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Graphique de charge
+        new Chart(loadCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Utilisateurs',
+                    data: [],
+                    borderColor: 'rgb(54, 162, 235)',
+                    yAxisID: 'y'
+                }, {
+                    label: 'Requêtes/s',
+                    data: [],
+                    borderColor: 'rgb(255, 159, 64)',
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Modification de la fonction updateDashboard
+        function updateDashboard() {
+            if (isOffline) {
+                // Utiliser les données locales
+                const mockData = generateMockData();
+                updateCharts(mockData);
+                updateMetrics(mockData);
+            } else {
+                // Mode en ligne normal
+                fetch('/api/monitoring')
+                    .then(response => response.json())
+                    .then(data => {
+                        localData = data;
+                        updateCharts(data);
+                        updateMetrics(data);
+                    })
+                    .catch(() => {
+                        // En cas d'erreur de connexion, basculer automatiquement en mode hors ligne
+                        isOffline = true;
+                        toggleOfflineMode();
+                    });
+            }
+        }
+
+        // Fonction pour mettre à jour les métriques
+        function updateMetrics(data) {
+            document.getElementById('global-status').className = `status-dot status-${data.status}`;
+            document.getElementById('global-status-text').textContent =
+                data.status === 'ok' ? 'Tout fonctionne correctement' :
+                    data.status === 'warning' ? 'Attention' : 'Erreur';
+
+            document.getElementById('uptime').textContent = `${data.uptime}%`;
+            document.getElementById('response-time').textContent = `${data.responseTime}ms`;
+            document.getElementById('load-users').textContent = data.loadTest.users;
+            document.getElementById('load-requests').textContent = data.loadTest.requestsPerSecond;
+        }
+
+        // Vérification initiale de la connexion
+        window.addEventListener('load', () => {
+            if (!navigator.onLine) {
+                isOffline = true;
+                toggleOfflineMode();
+            }
+            updateWelcomeMessage();
+        });
+
+        // Surveillance des changements de connexion
+        window.addEventListener('online', () => {
+            if (isOffline) {
+                isOffline = false;
+                toggleOfflineMode();
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            if (!isOffline) {
+                isOffline = true;
+                toggleOfflineMode();
+            }
+        });
+
+        // Mise à jour toutes les 5 secondes
+        setInterval(updateDashboard, 5000);
+        updateDashboard();
+
+        // Traductions
+        const translations = {
+            fr: {
+                welcome: "Bienvenue",
+                preferences: "Préférences",
+                close: "Fermer",
+                save: "Enregistrer",
+                profile: "Profil",
+                theme: "Thème",
+                language: "Langue",
+                primaryColor: "Couleur principale",
+                secondaryColor: "Couleur secondaire",
+                backgroundColor: "Couleur de fond",
+                offline: "Mode hors ligne",
+                online: "Mode en ligne",
+                activateOffline: "Activer mode hors ligne",
+                deactivateOffline: "Désactiver mode hors ligne"
+            },
+            en: {
+                welcome: "Welcome",
+                preferences: "Preferences",
+                close: "Close",
+                save: "Save",
+                profile: "Profile",
+                theme: "Theme",
+                language: "Language",
+                primaryColor: "Primary color",
+                secondaryColor: "Secondary color",
+                backgroundColor: "Background color",
+                offline: "Offline mode",
+                online: "Online mode",
+                activateOffline: "Activate offline mode",
+                deactivateOffline: "Deactivate offline mode"
+            },
+            es: {
+                welcome: "Bienvenido",
+                preferences: "Preferencias",
+                close: "Cerrar",
+                save: "Guardar",
+                profile: "Perfil",
+                theme: "Tema",
+                language: "Idioma",
+                primaryColor: "Color principal",
+                secondaryColor: "Color secundario",
+                backgroundColor: "Color de fondo",
+                offline: "Modo sin conexión",
+                online: "Modo en línea",
+                activateOffline: "Activar modo sin conexión",
+                deactivateOffline: "Desactivar modo sin conexión"
+            },
+            de: {
+                welcome: "Willkommen",
+                preferences: "Einstellungen",
+                close: "Schließen",
+                save: "Speichern",
+                profile: "Profil",
+                theme: "Thema",
+                language: "Sprache",
+                primaryColor: "Primärfarbe",
+                secondaryColor: "Sekundärfarbe",
+                backgroundColor: "Hintergrundfarbe",
+                offline: "Offline-Modus",
+                online: "Online-Modus",
+                activateOffline: "Offline-Modus aktivieren",
+                deactivateOffline: "Offline-Modus deaktivieren"
+            }
+        };
+
+        // Gestion des préférences étendue
+        function togglePreferences() {
+            const form = document.getElementById('preferences-form');
+            const button = document.getElementById('preferences-toggle');
+
+            if (form.style.display === 'block') {
+                form.style.display = 'none';
+                button.textContent = translations[getCurrentLanguage()].preferences;
+            } else {
+                form.style.display = 'block';
+                button.textContent = translations[getCurrentLanguage()].close;
+                loadPreferences();
+            }
+        }
+
+        function loadPreferences() {
+            const prenom = localStorage.getItem('prenom');
+            const primaryColor = localStorage.getItem('primaryColor') || '#4CAF50';
+            const secondaryColor = localStorage.getItem('secondaryColor') || '#2196F3';
+            const backgroundColor = localStorage.getItem('backgroundColor') || '#f5f5f5';
+            const language = localStorage.getItem('language') || 'fr';
+
+            const mainFont = localStorage.getItem('mainFont') || 'Arial, sans-serif';
+            const fontSize = localStorage.getItem('fontSize') || '16';
+            const chartStyle = localStorage.getItem('chartStyle') || 'default';
+            const chartLineStyle = localStorage.getItem('chartLineStyle') || 'straight';
+
+            if (prenom) document.getElementById('prenom').value = prenom;
+            document.getElementById('primary-color').value = primaryColor;
+            document.getElementById('secondary-color').value = secondaryColor;
+            document.getElementById('background-color').value = backgroundColor;
+            document.getElementById('language').value = language;
+
+            document.getElementById('main-font').value = mainFont;
+            document.getElementById('font-size').value = fontSize;
+            document.getElementById('font-size-value').textContent = `${fontSize}px`;
+            document.getElementById('chart-style').value = chartStyle;
+            document.getElementById('chart-line-style').value = chartLineStyle;
+
+            updateThemePreview();
+            updateTranslations();
+            updateFontPreview();
+            updateChartPreview();
+        }
+
+        function savePreferences() {
+            const prenom = document.getElementById('prenom').value;
+            const primaryColor = document.getElementById('primary-color').value;
+            const secondaryColor = document.getElementById('secondary-color').value;
+            const backgroundColor = document.getElementById('background-color').value;
+            const language = document.getElementById('language').value;
+
+            const mainFont = document.getElementById('main-font').value;
+            const fontSize = document.getElementById('font-size').value;
+            const chartStyle = document.getElementById('chart-style').value;
+            const chartLineStyle = document.getElementById('chart-line-style').value;
+
+            if (prenom) localStorage.setItem('prenom', prenom);
+            localStorage.setItem('primaryColor', primaryColor);
+            localStorage.setItem('secondaryColor', secondaryColor);
+            localStorage.setItem('backgroundColor', backgroundColor);
+            localStorage.setItem('language', language);
+
+            localStorage.setItem('mainFont', mainFont);
+            localStorage.setItem('fontSize', fontSize);
+            localStorage.setItem('chartStyle', chartStyle);
+            localStorage.setItem('chartLineStyle', chartLineStyle);
+
+            applyTheme();
+            applyFonts();
+            applyChartStyles();
+            updateTranslations();
+            updateWelcomeMessage();
+            togglePreferences();
+        }
+
+        function updateThemePreview() {
+            const preview = document.getElementById('theme-preview');
+            const primaryColor = document.getElementById('primary-color').value;
+            const secondaryColor = document.getElementById('secondary-color').value;
+            const backgroundColor = document.getElementById('background-color').value;
+
+            preview.style.background = `linear-gradient(90deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+        }
+
+        function applyTheme() {
+            const primaryColor = localStorage.getItem('primaryColor') || '#4CAF50';
+            const secondaryColor = localStorage.getItem('secondaryColor') || '#2196F3';
+            const backgroundColor = localStorage.getItem('backgroundColor') || '#f5f5f5';
+
+            document.documentElement.style.setProperty('--primary-color', primaryColor);
+            document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+            document.documentElement.style.setProperty('--background-color', backgroundColor);
+
+            // Mettre à jour les éléments avec les nouvelles couleurs
+            const elements = document.querySelectorAll('.status-ok, .preferences-form button');
+            elements.forEach(el => {
+                el.style.backgroundColor = primaryColor;
+            });
+        }
+
+        function getCurrentLanguage() {
+            return localStorage.getItem('language') || 'fr';
+        }
+
+        function updateTranslations() {
+            const lang = getCurrentLanguage();
+            const trans = translations[lang];
+
+            document.getElementById('preferences-toggle').textContent = trans.preferences;
+            document.querySelector('button[onclick="savePreferences()"]').textContent = trans.save;
+            document.querySelector('.preferences-section:nth-child(1) h3').textContent = trans.profile;
+            document.querySelector('.preferences-section:nth-child(2) h3').textContent = trans.theme;
+            document.querySelector('.preferences-section:nth-child(3) h3').textContent = trans.language;
+            document.querySelector('.color-picker:nth-child(1) label').textContent = trans.primaryColor;
+            document.querySelector('.color-picker:nth-child(2) label').textContent = trans.secondaryColor;
+            document.querySelector('.color-picker:nth-child(3) label').textContent = trans.backgroundColor;
+        }
+
+        function updateWelcomeMessage() {
+            const prenom = localStorage.getItem('prenom');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const lang = getCurrentLanguage();
+
+            if (prenom) {
+                welcomeMessage.textContent = `${translations[lang].welcome} ${prenom} !`;
+            } else {
+                welcomeMessage.textContent = '';
+            }
+        }
+
+        // Écouteurs d'événements pour les changements de couleur
+        document.getElementById('primary-color').addEventListener('input', updateThemePreview);
+        document.getElementById('secondary-color').addEventListener('input', updateThemePreview);
+        document.getElementById('background-color').addEventListener('input', updateThemePreview);
+
+        // Écouteurs d'événements pour les nouvelles options
+        document.getElementById('main-font').addEventListener('change', updateFontPreview);
+        document.getElementById('font-size').addEventListener('input', function () {
+            document.getElementById('font-size-value').textContent = `${this.value}px`;
+            updateFontPreview();
+        });
+        document.getElementById('chart-style').addEventListener('change', updateChartPreview);
+        document.getElementById('chart-line-style').addEventListener('change', updateChartPreview);
+
+        // Charger les préférences au démarrage
+        window.addEventListener('load', () => {
+            loadPreferences();
+            applyTheme();
+            updateWelcomeMessage();
+            // ... existing load event code ...
+        });
+
+        function updateFontPreview() {
+            const mainFont = document.getElementById('main-font').value;
+            const fontSize = document.getElementById('font-size').value;
+            document.body.style.fontFamily = mainFont;
+            document.body.style.fontSize = `${fontSize}px`;
+        }
+
+        function updateChartPreview() {
+            const preview = document.getElementById('chart-preview');
+            const style = document.getElementById('chart-style').value;
+            const lineStyle = document.getElementById('chart-line-style').value;
+
+            // Créer un mini-graphique de prévisualisation
+            const ctx = preview.getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1', '2', '3', '4', '5'],
+                    datasets: [{
+                        label: 'Exemple',
+                        data: [12, 19, 3, 5, 2],
+                        borderColor: getChartColor(style),
+                        backgroundColor: getChartBackground(style),
+                        tension: lineStyle === 'smooth' ? 0.4 : 0,
+                        stepped: lineStyle === 'stepped'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            display: false
+                        },
+                        x: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function getChartColor(style) {
+            switch (style) {
+                case 'dark': return '#333333';
+                case 'minimal': return '#666666';
+                case 'colorful': return '#FF6B6B';
+                default: return '#4CAF50';
+            }
+        }
+
+        function getChartBackground(style) {
+            switch (style) {
+                case 'dark': return 'rgba(51, 51, 51, 0.1)';
+                case 'minimal': return 'rgba(102, 102, 102, 0.1)';
+                case 'colorful': return 'rgba(255, 107, 107, 0.1)';
+                default: return 'rgba(76, 175, 80, 0.1)';
+            }
+        }
+
+        function applyFonts() {
+            const mainFont = localStorage.getItem('mainFont') || 'Arial, sans-serif';
+            const fontSize = localStorage.getItem('fontSize') || '16';
+            document.body.style.fontFamily = mainFont;
+            document.body.style.fontSize = `${fontSize}px`;
+        }
+
+        function applyChartStyles() {
+            const style = localStorage.getItem('chartStyle') || 'default';
+            const lineStyle = localStorage.getItem('chartLineStyle') || 'straight';
+
+            // Mettre à jour tous les graphiques existants
+            Chart.helpers.each(Chart.instances, (instance) => {
+                instance.data.datasets.forEach(dataset => {
+                    dataset.borderColor = getChartColor(style);
+                    dataset.backgroundColor = getChartBackground(style);
+                    dataset.tension = lineStyle === 'smooth' ? 0.4 : 0;
+                    dataset.stepped = lineStyle === 'stepped';
+                });
+                instance.update();
+            });
+        }
+
+        // Ajout des traductions pour les thèmes
+        Object.keys(translations).forEach(lang => {
+            translations[lang] = {
+                ...translations[lang],
+                themePresets: "Thèmes prédéfinis",
+                classic: "Classique",
+                professional: "Professionnel",
+                dark: "Sombre",
+                nature: "Nature",
+                minimalist: "Minimaliste",
+                classicDesc: "Vert et bleu",
+                professionalDesc: "Bleu marine et gris",
+                darkDesc: "Noir et rouge",
+                natureDesc: "Vert et jaune",
+                minimalistDesc: "Nuances de gris"
+            };
+        });
+
+        // Définition des thèmes prédéfinis
+        const themePresets = {
+            classique: {
+                primaryColor: '#4CAF50',
+                secondaryColor: '#2196F3',
+                backgroundColor: '#f5f5f5',
+                mainFont: 'Arial, sans-serif',
+                fontSize: '16',
+                chartStyle: 'default',
+                chartLineStyle: 'straight'
+            },
+            professionnel: {
+                primaryColor: '#2C3E50',
+                secondaryColor: '#3498DB',
+                backgroundColor: '#ECF0F1',
+                mainFont: "'Roboto', sans-serif",
+                fontSize: '14',
+                chartStyle: 'minimal',
+                chartLineStyle: 'smooth'
+            },
+            sombre: {
+                primaryColor: '#1A1A1A',
+                secondaryColor: '#FF6B6B',
+                backgroundColor: '#2D2D2D',
+                mainFont: "'Montserrat', sans-serif",
+                fontSize: '15',
+                chartStyle: 'dark',
+                chartLineStyle: 'straight'
+            },
+            nature: {
+                primaryColor: '#2ECC71',
+                secondaryColor: '#F1C40F',
+                backgroundColor: '#E8F5E9',
+                mainFont: "'Open Sans', sans-serif",
+                fontSize: '16',
+                chartStyle: 'colorful',
+                chartLineStyle: 'smooth'
+            },
+            minimaliste: {
+                primaryColor: '#666666',
+                secondaryColor: '#999999',
+                backgroundColor: '#FFFFFF',
+                mainFont: "'Lato', sans-serif",
+                fontSize: '14',
+                chartStyle: 'minimal',
+                chartLineStyle: 'straight'
+            }
+        };
+
+        function applyThemePreset(presetName) {
+            const preset = themePresets[presetName];
+
+            // Mettre à jour les valeurs des champs
+            document.getElementById('primary-color').value = preset.primaryColor;
+            document.getElementById('secondary-color').value = preset.secondaryColor;
+            document.getElementById('background-color').value = preset.backgroundColor;
+            document.getElementById('main-font').value = preset.mainFont;
+            document.getElementById('font-size').value = preset.fontSize;
+            document.getElementById('font-size-value').textContent = `${preset.fontSize}px`;
+            document.getElementById('chart-style').value = preset.chartStyle;
+            document.getElementById('chart-line-style').value = preset.chartLineStyle;
+
+            // Appliquer les changements
+            updateThemePreview();
+            updateFontPreview();
+            updateChartPreview();
+
+            // Sauvegarder les préférences
+            savePreferences();
+        }
+    </script>
+</body>
+
+</html>
