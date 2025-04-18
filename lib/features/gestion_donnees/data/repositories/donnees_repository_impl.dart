@@ -1,6 +1,7 @@
 // features/gestion_donnees/data/repositories/donnees_repository_impl.dart
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/repositories/donnees_repository.dart';
+import 'dart:convert';
 
 class DonneesRepositoryImpl implements DonneesRepository {
   final SharedPreferences prefs;
@@ -55,5 +56,31 @@ class DonneesRepositoryImpl implements DonneesRepository {
   @override
   Future<bool> removeLogo() async {
     return prefs.remove('logo_path');
+  }
+
+  @override
+  Future<bool> sauvegarderDonnees(Map<String, dynamic> donnees) async {
+    for (final entry in donnees.entries) {
+      await ajouterDonnee(entry.key, entry.value);
+    }
+    return true;
+  }
+
+  @override
+  Future<Map<String, dynamic>> chargerDonnees() async {
+    return getDonnees();
+  }
+
+  @override
+  Future<bool> supprimerDonnees(String id) async {
+    return prefs.remove(id);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> obtenirHistorique() async {
+    final historique = prefs.getStringList('historique') ?? [];
+    return historique
+        .map((json) => Map<String, dynamic>.from(jsonDecode(json)))
+        .toList();
   }
 }

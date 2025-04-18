@@ -21,4 +21,20 @@ class DonneesController {
   Future<bool> supprimerDonnee(String cle) async {
     return await _repository.supprimerDonnee(cle);
   }
+
+  Future<bool> sauvegarderDonnees(Map<String, dynamic> donnees) async {
+    return await _repository.sauvegarderDonnees(donnees);
+  }
+
+  Future<Map<String, dynamic>> chargerDonnees() async {
+    return await _repository.chargerDonnees();
+  }
+
+  Future<bool> supprimerDonnees(String id) async {
+    return await _repository.supprimerDonnees(id);
+  }
+
+  Future<List<Map<String, dynamic>>> obtenirHistorique() async {
+    return await _repository.obtenirHistorique();
+  }
 }

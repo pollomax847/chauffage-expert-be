@@ -9,4 +9,9 @@ abstract class DonneesRepository {
   Future<String?> getLogoPath();
   Future<bool> setLogoPath(String path);
   Future<bool> removeLogo();
+
+  Future<bool> sauvegarderDonnees(Map<String, dynamic> donnees);
+  Future<Map<String, dynamic>> chargerDonnees();
+  Future<bool> supprimerDonnees(String id);
+  Future<List<Map<String, dynamic>>> obtenirHistorique();
 }

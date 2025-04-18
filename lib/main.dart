@@ -13,7 +13,8 @@ import 'di/app_module.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppModule.init();
+  // Commenté temporairement pour le débogage
+  // await AppModule.init();
   runApp(
     const ProviderScope(
       child: MyApp(),
