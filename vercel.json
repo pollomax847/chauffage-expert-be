@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
         {
-            "src": "build/web/**",
+            "src": "web/**",
             "use": "@vercel/static"
         }
     ],
@@ -66,7 +66,7 @@
     "rewrites": [
         {
             "source": "/(.*)",
-            "destination": "/build/web/index.html"
+            "destination": "/web/index.html"
         }
     ],
     "env": {
