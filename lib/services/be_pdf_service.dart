@@ -4,13 +4,8 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:excel/excel.dart';
-import 'package:get_it/get_it.dart';
-import '../features/gestion_donnees/domain/repositories/donnees_repository.dart';
 import '../models/radiateur.dart';
 import '../services/analyse_thermique_service.dart';
-import '../services/calcul_service.dart';
-import '../models/appareil.dart';
 
 class BEPdfService {
   // Méthodes pour générer des PDFs

@@ -7,27 +7,22 @@
       "src": "/(.*\\.js)",
       "headers": {
         "Content-Type": "application/javascript",
-        "X-Content-Type-Options": "nosniff"
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
     { 
       "src": "/(.*\\.wasm)",
       "headers": {
         "Content-Type": "application/wasm",
-        "X-Content-Type-Options": "nosniff"
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
     { 
       "src": "/(.*\\.json)",
       "headers": {
         "Content-Type": "application/json",
-        "X-Content-Type-Options": "nosniff"
-      }
-    },
-    { 
-      "src": "/(.*\\.html)",
-      "headers": {
-        "Content-Type": "text/html",
         "X-Content-Type-Options": "nosniff"
       }
     },
@@ -39,13 +34,30 @@
       }
     },
     { 
-      "src": "/(.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.ico)",
+      "src": "/(.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.ico|.*\\.svg)",
       "headers": {
-        "Content-Type": "image/*",
-        "X-Content-Type-Options": "nosniff"
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cross-Origin-Embedder-Policy",
+          "value": "require-corp"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        }
+      ]
+    }
   ],
   "buildCommand": "chmod +x ./build_web.sh && ./build_web.sh",
   "outputDirectory": "build/web",

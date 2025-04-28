@@ -1,6 +1,6 @@
-# Chauffage Expert
+# Chauffage Expert BE
 
-Application de calcul et de gestion pour les installations de chauffage.
+Application professionnelle pour les techniciens chauffagistes et bureaux d'études.
 
 ## Fonctionnalités
 
@@ -50,17 +50,45 @@ flutter run
 ## Structure du projet
 
 ```
-lib/
-  ├── models/           # Modèles de données
-  ├── providers/        # Providers Riverpod
-  ├── screens/          # Écrans de l'application
-  ├── services/         # Services (base de données, PDF, etc.)
-  ├── theme/            # Thème de l'application
-  ├── utils/            # Utilitaires
-  ├── widgets/          # Widgets réutilisables
-  ├── app_routes.dart   # Routes de l'application
-  └── main.dart         # Point d'entrée de l'application
+.
+├── assets/           # Ressources statiques (images, fonts, etc.)
+├── core/             # Code core de l'application
+├── docs/             # Documentation
+│   ├── installation.md
+│   ├── tutorial.md
+│   ├── user-guide.md
+│   └── technical-docs.md
+├── features/         # Fonctionnalités de l'application
+├── lib/              # Code source principal
+├── logs/             # Fichiers de logs
+├── scripts/          # Scripts utilitaires
+│   ├── build_web.sh
+│   ├── deploy.sh
+│   └── rotate_logs.sh
+├── tests/            # Tests et fichiers de test
+└── web/              # Configuration web
 ```
+
+## Documentation
+
+La documentation complète est disponible dans le dossier `docs/` :
+- Guide d'installation : `docs/installation.md`
+- Tutoriel : `docs/tutorial.md`
+- Guide utilisateur : `docs/user-guide.md`
+- Documentation technique : `docs/technical-docs.md`
+
+## Déploiement
+
+Le déploiement est géré par deux scripts principaux :
+- `scripts/build_web.sh` : Construction de l'application web
+- `scripts/deploy.sh` : Déploiement sur Vercel
+
+## Gestion des logs
+
+Les logs sont automatiquement gérés par le script `scripts/rotate_logs.sh` qui :
+- Compresse les logs lorsqu'ils dépassent 10MB
+- Conserve les 5 dernières versions compressées
+- Supprime automatiquement les anciennes versions
 
 ## Contribution
 

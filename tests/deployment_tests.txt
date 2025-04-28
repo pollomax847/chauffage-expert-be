@@ -1,4 +1,5 @@
 Test de déploiement automatique
+Date: 2024-04-07 Test de déploiement automatique
 Version: 2.0.0
 Date: 2024-04-07
 Heure: 12:45 
