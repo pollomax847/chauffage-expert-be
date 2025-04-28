@@ -1,18 +1,11 @@
 {
-    "version": 2,
-    "framework": "flutter",
-    "buildCommand": "flutter build web --release",
+    "framework": "nextjs",
     "outputDirectory": "build/web",
+    "buildCommand": "./build_web.sh",
     "installCommand": "flutter pub get",
     "env": {
         "production": "true"
     },
-    "rewrites": [
-        {
-            "source": "/(.*)",
-            "destination": "/index.html"
-        }
-    ],
     "headers": [
         {
             "source": "/(.*)",
@@ -24,37 +17,37 @@
             ]
         },
         {
-            "source": "/assets/(.*)",
+            "source": "/assets/(.*)",ce": "/assets/(.*)",
             "headers": [
                 {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
+                    "key": "Cache-Control",   "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"       "value": "public, max-age=31536000, immutable"
+                }      }
+            ]   ]
+        },
+        {
+            "source": "/favicon.png",ce": "/favicon.png",
+            "headers": [
+                {
+                    "key": "Cache-Control",   "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"       "value": "public, max-age=31536000, immutable"
+                },      },
+                {       {
+                    "key": "Content-Type",ype",
+                    "value": "image/png"ue": "image/png"
                 }
             ]
         },
         {
-            "source": "/favicon.png",
+            "source": "/favicon.ico",ce": "/favicon.ico",
             "headers": [
                 {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                },
-                {
-                    "key": "Content-Type",
-                    "value": "image/png"
-                }
-            ]
-        },
-        {
-            "source": "/favicon.ico",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                },
-                {
-                    "key": "Content-Type",
-                    "value": "image/x-icon"
+                    "key": "Cache-Control",   "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"       "value": "public, max-age=31536000, immutable"
+                },      },
+                {       {
+                    "key": "Content-Type",ype",
+                    "value": "image/x-icon"ue": "image/x-icon"
                 }
             ]
         }
@@ -62,13 +55,13 @@
     "builds": [
         {
             "src": "build/web/**",
-            "use": "@vercel/static"
+            "use": "@vercel/static": "@vercel/static"
         }
     ],
-    "routes": [
+    "routes": [outes": [
         {
-            "src": "/(.*)",
+            "src": "/(.*)",   "handle": "filesystem"
             "dest": "/index.html"
         }
-    ]
+    ]   "src": "/(.*)",
 }

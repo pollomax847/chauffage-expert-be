@@ -71,6 +71,24 @@ flutter clean
 flutter pub get
 ```
 
+## Déploiement
+
+Pour déployer l'application :
+
+```bash
+./deploy.sh -e production
+```
+
+### Problèmes courants de déploiement
+
+Si vous rencontrez l'erreur "This deployment can not be redeployed", utilisez l'option `--force` :
+
+```bash
+./deploy.sh -e production --force
+```
+
+Cette option crée un commit vide qui permettra à Vercel de traiter le déploiement comme nouveau.
+
 ## Dépannage
 
 ### Problèmes Courants
@@ -111,4 +129,4 @@ Pour toute assistance :
 3. **Protection des données**
    - Chiffrement des données sensibles
    - Sauvegarde automatique
-   - Journalisation des actions 
+   - Journalisation des actions

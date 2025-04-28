@@ -5,10 +5,11 @@ show_help() {
     echo "Usage: ./deploy.sh [OPTIONS]"
     echo "Options:"
     echo "  -e, --environment ENV   Environnement de déploiement (staging/production)"
-    echo "  -d, --domain DOMAIN    Domaine personnalisé"
-    echo "  -t, --test             Exécuter les tests après le déploiement"
-    echo "  -m, --monitor          Activer le monitoring continu"
-    echo "  -h, --help             Afficher cette aide"
+    echo "  -d, --domain DOMAIN     Domaine personnalisé"
+    echo "  -t, --test              Exécuter les tests après le déploiement"
+    echo "  -m, --monitor           Activer le monitoring continu"
+    echo "  -f, --force             Force le déploiement avec un commit vide"
+    echo "  -h, --help              Afficher cette aide"
     exit 0
 }
 
@@ -17,6 +18,7 @@ ENVIRONMENT="staging"
 DOMAIN=""
 RUN_TESTS=false
 MONITOR=false
+FORCE_DEPLOY=false
 
 # Traitement des arguments
 while [[ $# -gt 0 ]]; do
@@ -37,6 +39,10 @@ while [[ $# -gt 0 ]]; do
             MONITOR=true
             shift
             ;;
+        -f|--force)
+            FORCE_DEPLOY=true
+            shift
+            ;;
         -h|--help)
             show_help
             ;;
@@ -53,9 +59,21 @@ if [[ "$ENVIRONMENT" != "staging" && "$ENVIRONMENT" != "production" ]]; then
     exit 1
 fi
 
+# Créer un commit vide si l'option force est activée
+if [ "$FORCE_DEPLOY" = true ]; then
+    echo "Création d'un commit vide pour forcer le déploiement..."
+    git commit --allow-empty -m "Force deployment $(date)"
+    
+    if [ $? -ne 0 ]; then
+        echo "Erreur lors de la création du commit vide. Vérifiez que git est configuré correctement."
+        echo "Vous pouvez exécuter: git config --global user.email \"you@example.com\" && git config --global user.name \"Your Name\""
+        exit 1
+    fi
+fi
+
 # Construction de l'application
 echo "Construction de l'application pour l'environnement $ENVIRONMENT..."
-./build.sh
+./scripts/build.sh
 
 if [ $? -ne 0 ]; then
     echo "Erreur lors de la construction"
@@ -107,4 +125,9 @@ if [ "$RUN_TESTS" = true ]; then
 fi
 if [ "$MONITOR" = true ]; then
     echo "Monitoring: Actif"
-fi 
+fi
+
+# Message informatif pour les problèmes de redéploiement
+echo ""
+echo "Note: Si vous rencontrez des erreurs de type 'This deployment can not be redeployed', "
+echo "utilisez l'option '-f' ou '--force' pour créer un nouveau commit vide."
