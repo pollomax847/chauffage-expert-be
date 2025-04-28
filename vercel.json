@@ -3,15 +3,48 @@
   "framework": "static",
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/(.*\\.js)", "dest": "/$1", "headers": { "Content-Type": "application/javascript" } },
-    { "src": "/flutter_bootstrap.js", "dest": "/flutter_bootstrap.js", "headers": { "Content-Type": "application/javascript" } },
-    { "src": "/flutter.js", "dest": "/flutter.js", "headers": { "Content-Type": "application/javascript" } },
-    { "src": "/main.dart.js", "dest": "/main.dart.js", "headers": { "Content-Type": "application/javascript" } },
-    { "src": "/(.*\\.json)", "dest": "/$1", "headers": { "Content-Type": "application/json" } },
-    { "src": "/(.*\\.png)", "dest": "/$1", "headers": { "Content-Type": "image/png" } },
-    { "src": "/(.*\\.html)", "dest": "/$1", "headers": { "Content-Type": "text/html" } },
-    { "src": "/(.*\\.css)", "dest": "/$1", "headers": { "Content-Type": "text/css" } },
-    { "src": "/(.*\\.wasm)", "dest": "/$1", "headers": { "Content-Type": "application/wasm" } },
+    { 
+      "src": "/(.*\\.js)",
+      "headers": {
+        "Content-Type": "application/javascript",
+        "X-Content-Type-Options": "nosniff"
+      }
+    },
+    { 
+      "src": "/(.*\\.wasm)",
+      "headers": {
+        "Content-Type": "application/wasm",
+        "X-Content-Type-Options": "nosniff"
+      }
+    },
+    { 
+      "src": "/(.*\\.json)",
+      "headers": {
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff"
+      }
+    },
+    { 
+      "src": "/(.*\\.html)",
+      "headers": {
+        "Content-Type": "text/html",
+        "X-Content-Type-Options": "nosniff"
+      }
+    },
+    { 
+      "src": "/(.*\\.css)",
+      "headers": {
+        "Content-Type": "text/css",
+        "X-Content-Type-Options": "nosniff"
+      }
+    },
+    { 
+      "src": "/(.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.ico)",
+      "headers": {
+        "Content-Type": "image/*",
+        "X-Content-Type-Options": "nosniff"
+      }
+    },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
   "buildCommand": "chmod +x ./build_web.sh && ./build_web.sh",

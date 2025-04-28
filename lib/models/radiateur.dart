@@ -1,3 +1,4 @@
+// models/radiateur.dart
 class Radiateur {
   final String id;
   final String reference;
@@ -8,6 +9,10 @@ class Radiateur {
   final String materiau; // Exemple: 'acier', 'fonte', 'aluminium'
   final String typeRaccordement; // Exemple: 'central', 'lateral'
   final double entraxe; // en mm
+  final String identification; // Identification de la pièce
+  final String? modele; // Modèle du radiateur
+  final double besoinThermique; // Besoin thermique en W
+  final String materiauTuyauterie; // Matériau de la tuyauterie
 
   Radiateur({
     required this.id,
@@ -19,6 +24,10 @@ class Radiateur {
     required this.materiau,
     required this.typeRaccordement,
     required this.entraxe,
+    required this.identification,
+    this.modele,
+    required this.besoinThermique,
+    required this.materiauTuyauterie,
   });
 
   factory Radiateur.fromJson(Map<String, dynamic> json) {
@@ -32,6 +41,11 @@ class Radiateur {
       materiau: json['materiau'] ?? '',
       typeRaccordement: json['type_raccordement'] ?? '',
       entraxe: double.tryParse(json['entraxe'].toString()) ?? 0.0,
+      identification: json['identification'] ?? '',
+      modele: json['modele'],
+      besoinThermique:
+          double.tryParse(json['besoin_thermique'].toString()) ?? 0.0,
+      materiauTuyauterie: json['materiau_tuyauterie'] ?? '',
     );
   }
 
@@ -46,6 +60,10 @@ class Radiateur {
       'materiau': materiau,
       'type_raccordement': typeRaccordement,
       'entraxe': entraxe,
+      'identification': identification,
+      'modele': modele,
+      'besoin_thermique': besoinThermique,
+      'materiau_tuyauterie': materiauTuyauterie,
     };
   }
 }

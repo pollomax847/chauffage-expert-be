@@ -2,17 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'pages/home_page.dart';
+import 'screens/home_page.dart';
 import 'pages/dimensionnement_page.dart';
 import 'pages/be_page.dart';
 import 'pages/reglementation_page.dart';
 import 'pages/export_page.dart';
 import 'pages/gestion_donnees_page.dart';
-import 'pages/radiateurs_page.dart';
+import 'screens/radiateurs_page.dart';
 import 'theme/app_theme.dart';
 import 'di/app_module.dart';
-import '../screens/radiateurs_page.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

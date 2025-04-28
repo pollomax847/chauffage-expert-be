@@ -13,4 +13,15 @@ flutter clean
 flutter pub get
 
 # Construire l'application web
-flutter build web --release --base-href / 
+flutter build web --release
+
+# Vérifier que les fichiers nécessaires sont présents
+if [ ! -f "build/web/flutter.js" ]; then
+    echo "Error: flutter.js not found in build/web directory"
+    exit 1
+fi
+
+if [ ! -f "build/web/main.dart.js" ]; then
+    echo "Error: main.dart.js not found in build/web directory"
+    exit 1
+fi 
