@@ -88,6 +88,12 @@ class HomePage extends ConsumerWidget {
                   description: 'Gestion et sauvegarde des données techniques',
                   onTap: () => context.go('/gestion-donnees'),
                 ),
+                ThemeCard(
+                  title: 'Radiateurs',
+                  icon: Icons.heating,
+                  description: 'Visualisation des radiateurs de test',
+                  onTap: () => context.go('/radiateurs'),
+                ),
               ],
             ),
           ],

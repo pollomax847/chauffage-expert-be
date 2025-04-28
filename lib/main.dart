@@ -8,8 +8,11 @@ import 'pages/be_page.dart';
 import 'pages/reglementation_page.dart';
 import 'pages/export_page.dart';
 import 'pages/gestion_donnees_page.dart';
+import 'pages/radiateurs_page.dart';
 import 'theme/app_theme.dart';
 import 'di/app_module.dart';
+import '../screens/radiateurs_page.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +53,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/gestion-donnees',
       builder: (context, state) => const GestionDonneesPage(),
+    ),
+    GoRoute(
+      path: '/radiateurs',
+      builder: (context, state) => const RadiateursPage(),
     ),
   ],
 );

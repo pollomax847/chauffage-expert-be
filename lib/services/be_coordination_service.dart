@@ -1,6 +1,5 @@
 // services/be_coordination_service.dart
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 import 'be_chauffage.dart';
 import 'be_hydraulique.dart';

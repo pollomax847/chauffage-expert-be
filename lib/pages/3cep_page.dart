@@ -51,6 +51,20 @@ class _TroisCEPPageState extends ConsumerState<TroisCEPPage> {
   Map<String, dynamic>? _resultats;
 
   @override
+  void initState() {
+    super.initState();
+    // Initialisation avec des valeurs par défaut
+    _typeBatimentController.text = 'Individuel';
+    _nombrePersonnesController.text = '4';
+    _zoneClimatiqueController.text = 'H1';
+    _temperatureInterieureController.text = '19';
+    _coefficientSecuriteController.text = '1.1';
+    _coefficientSimultaneiteECSController.text = '0.7';
+    _tempsRechauffementController.text = '1';
+    _penteEUEVController.text = '2';
+  }
+
+  @override
   void dispose() {
     _typeBatimentController.dispose();
     _nombrePersonnesController.dispose();
@@ -64,23 +78,91 @@ class _TroisCEPPageState extends ConsumerState<TroisCEPPage> {
   }
 
   void _calculer() {
-    setState(() {
-      _resultats = BE3CEP.calculerInstallation(
-        typeBatiment: _typeBatimentController.text,
-        nombrePersonnes: int.parse(_nombrePersonnesController.text),
-        zoneClimatique: _zoneClimatiqueController.text,
-        temperatureInterieure:
-            double.parse(_temperatureInterieureController.text),
-        surfaces: _surfaces,
-        coefficientSecurite: double.parse(_coefficientSecuriteController.text),
-        coefficientSimultaneiteECS:
-            double.parse(_coefficientSimultaneiteECSController.text),
-        tempsRechauffement: double.parse(_tempsRechauffementController.text),
-        appareilsSanitaires: _appareilsSanitaires,
-        penteEUEV: double.parse(_penteEUEVController.text),
-        locaux: _locaux,
+    // Validation des entrées
+    if (_typeBatimentController.text.isEmpty ||
+        _nombrePersonnesController.text.isEmpty ||
+        _zoneClimatiqueController.text.isEmpty ||
+        _temperatureInterieureController.text.isEmpty ||
+        _coefficientSecuriteController.text.isEmpty ||
+        _coefficientSimultaneiteECSController.text.isEmpty ||
+        _tempsRechauffementController.text.isEmpty ||
+        _penteEUEVController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez remplir tous les champs obligatoires'),
+          backgroundColor: Colors.red,
+        ),
       );
-    });
+      return;
+    }
+
+    try {
+      setState(() {
+        _resultats = BE3CEP.calculerInstallation(
+          typeBatiment: _typeBatimentController.text,
+          nombrePersonnes: int.parse(_nombrePersonnesController.text),
+          zoneClimatique: _zoneClimatiqueController.text,
+          temperatureInterieure:
+              double.parse(_temperatureInterieureController.text),
+          surfaces: _surfaces,
+          coefficientSecurite:
+              double.parse(_coefficientSecuriteController.text),
+          coefficientSimultaneiteECS:
+              double.parse(_coefficientSimultaneiteECSController.text),
+          tempsRechauffement: double.parse(_tempsRechauffementController.text),
+          appareilsSanitaires: _appareilsSanitaires,
+          penteEUEV: double.parse(_penteEUEVController.text),
+          locaux: _locaux,
+        );
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur de calcul: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // Génération d'un rapport PDF
+  Future<void> _genererPDF() async {
+    if (_resultats == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez d\'abord effectuer un calcul'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final pdfPath = await BE3CEP.exporterResultatsVersPDF(
+        _resultats!,
+        _typeBatimentController.text,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('PDF généré: $pdfPath'),
+          backgroundColor: Colors.green,
+          action: SnackBarAction(
+            label: 'Ouvrir',
+            onPressed: () {
+              // Utiliser un package comme url_launcher pour ouvrir le fichier
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la génération du PDF: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -367,6 +449,13 @@ class _TroisCEPPageState extends ConsumerState<TroisCEPPage> {
           ],
         ),
       ),
+      floatingActionButton: _resultats != null
+          ? FloatingActionButton(
+              onPressed: _genererPDF,
+              tooltip: 'Générer PDF',
+              child: const Icon(Icons.picture_as_pdf),
+            )
+          : null,
     );
   }
 

@@ -16,10 +16,10 @@ class RapportThermiquePage extends StatelessWidget {
       ),
       body: RapportThermiqueWidget(
         radiateurs: radiateurs,
-        besoinsThermiques: [], // Provide appropriate data
-        materiauxTuyauterie: [], // Provide appropriate data
-        identifications: [], // Provide appropriate data
-        modeles: [], // Provide appropriate data
+        besoinsThermiques: const [], // Provide appropriate data
+        materiauxTuyauterie: const [], // Provide appropriate data
+        identifications: const [], // Provide appropriate data
+        modeles: const [], // Provide appropriate data
       ),
     );
   }

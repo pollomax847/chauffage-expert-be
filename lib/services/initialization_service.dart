@@ -3,9 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'client_db.dart';
 import 'be_pdf_service.dart'; // This file now contains the definition of BEPdfService
 import 'be_logic.dart';
-import 'be_hydraulique.dart';
-import 'be_schema_service.dart';
-import 'be_validation_service.dart';
 import 'configuration_service.dart';
 
 /// Service d'initialisation qui configure toutes les dépendances

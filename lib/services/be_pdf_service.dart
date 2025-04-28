@@ -46,7 +46,7 @@ class BEPdfService {
             if (piedPage != null)
               pw.Text(
                 piedPage['texte'] ?? '',
-                style: pw.TextStyle(fontSize: 12),
+                style: const pw.TextStyle(fontSize: 12),
               ),
           ],
         ),
@@ -217,5 +217,40 @@ class BEPdfService {
         }
       }).toList(),
     );
+  }
+
+  static Future<String> genererRapport({
+    required String module,
+    required Map<String, dynamic> parametres,
+    required Map<String, dynamic> resultats,
+  }) async {
+    // Implementation for generating a PDF report
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              'Rapport - $module',
+              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text('Paramètres:'),
+            _buildResultsSection(parametres),
+            pw.SizedBox(height: 20),
+            pw.Text('Résultats:'),
+            _buildResultsSection(resultats),
+          ],
+        ),
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File(
+        '${output.path}/rapport_${module.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}.pdf');
+    await file.writeAsBytes(await pdf.save());
+    return file.path;
   }
 }

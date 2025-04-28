@@ -1,5 +1,4 @@
 import '../models/radiateur.dart';
-import '../models/etude.dart';
 
 class AnalyseThermiqueService {
   // Vérifie si la puissance du radiateur est suffisante
