@@ -1,5 +1,4 @@
 // services/configuration_service.dart
-import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ConfigurationService {

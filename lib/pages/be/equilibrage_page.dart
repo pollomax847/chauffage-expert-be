@@ -216,7 +216,7 @@ class _EquilibragePageState extends ConsumerState<EquilibragePage> {
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _ajouterRadiateur,
@@ -377,7 +377,7 @@ class _EquilibragePageState extends ConsumerState<EquilibragePage> {
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _ajouterPlancher,
@@ -435,7 +435,7 @@ class _EquilibragePageState extends ConsumerState<EquilibragePage> {
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                         const SizedBox(height: 16),
                         Text(
                           'Planchers chauffants',
@@ -467,7 +467,7 @@ class _EquilibragePageState extends ConsumerState<EquilibragePage> {
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),

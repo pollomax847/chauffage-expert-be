@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'be_security_service.dart';
 
 class BEGeothermieService {
@@ -108,7 +107,7 @@ class BEGeothermieService {
     double temperatureEau,
   ) {
     // Calcul du nombre de sondes nécessaires
-    final puissanceParSonde = 50.0; // W/m
+    const puissanceParSonde = 50.0; // W/m
     final longueurTotale = puissanceThermique / puissanceParSonde;
     final nombreSondes = (longueurTotale / _profondeurCaptage).ceil();
     

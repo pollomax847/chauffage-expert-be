@@ -9,7 +9,6 @@ import 'pages/reglementation_page.dart';
 import 'pages/export_page.dart';
 import 'pages/gestion_donnees_page.dart';
 import 'theme/app_theme.dart';
-import 'di/app_module.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +42,7 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/export',
-      builder: (context, state) => ExportPage(
+      builder: (context, state) => const ExportPage(
         typeExport: 'pdf',
         titre: 'Exportation des données',
       ),

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'dart:math';
 
 class BEHydraulique {
@@ -88,7 +87,7 @@ class BEHydraulique {
     final vitesse = (debit / 1000) / section;
 
     // Nombre de Reynolds
-    final viscosite = 1.003e-6; // m²/s à 20°C
+    const viscosite = 1.003e-6; // m²/s à 20°C
     final reynolds = (vitesse * diametre / 1000) / viscosite;
 
     // Coefficient de perte de charge linéaire (Darcy-Weisbach)
@@ -99,7 +98,7 @@ class BEHydraulique {
         lambda * (longueur / (diametre / 1000)) * pow(vitesse, 2) / (2 * 9.81);
 
     // Pertes de charge singulières (mCE)
-    final kCoude = 0.3; // Coefficient de perte de charge pour un coude
+    const kCoude = 0.3; // Coefficient de perte de charge pour un coude
     final pertesSingulieres =
         nombreCoudes * kCoude * pow(vitesse, 2) / (2 * 9.81);
 

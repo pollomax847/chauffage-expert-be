@@ -1,13 +1,8 @@
 import 'dart:async';
 import 'dart:isolate';
-import 'package:flutter/foundation.dart';
 import 'be_chauffage.dart';
 import 'be_hydraulique.dart';
 import 'be_vmc.dart';
-import 'be_geothermie.dart';
-import 'be_regulation.dart';
-import 'be_alimentation.dart';
-import 'be_evacuation.dart';
 import 'be_security_service.dart';
 
 class BEOptimizationService {

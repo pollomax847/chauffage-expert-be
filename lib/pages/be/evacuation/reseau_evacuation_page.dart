@@ -81,7 +81,7 @@ class _ReseauEvacuationPageState extends ConsumerState<ReseauEvacuationPage> {
                       controller: entry.value,
                       decoration: InputDecoration(
                         labelText:
-                            '${entry.key.replaceAll('_', ' ').toUpperCase()}',
+                            entry.key.replaceAll('_', ' ').toUpperCase(),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {

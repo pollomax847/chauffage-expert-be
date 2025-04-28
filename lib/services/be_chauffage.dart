@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 
 class BEChauffage {
   // Coefficients de déperdition selon le type de paroi
@@ -80,7 +79,7 @@ class BEChauffage {
         lambda * (longueur / (diametre / 1000)) * pow(vitesse, 2) / (2 * 9.81);
 
     // Pertes de charge singulières (mCE)
-    final kCoude = 0.3;
+    const kCoude = 0.3;
     final pertesSingulieres =
         nombreCoudes * kCoude * pow(vitesse, 2) / (2 * 9.81);
 

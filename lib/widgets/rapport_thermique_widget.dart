@@ -8,8 +8,7 @@ import '../services/pdf_service.dart';
 class RapportThermiqueWidget extends StatelessWidget {
   final List<Radiateur> radiateurs;
 
-  const RapportThermiqueWidget({Key? key, required this.radiateurs})
-      : super(key: key);
+  const RapportThermiqueWidget({super.key, required this.radiateurs});
 
   Future<void> _genererEtTelechargerPDF(BuildContext context) async {
     try {
@@ -163,7 +162,7 @@ class RapportThermiqueWidget extends StatelessWidget {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
-        ...rapports.map((rapport) => _buildRadiateurCard(rapport)).toList(),
+        ...rapports.map((rapport) => _buildRadiateurCard(rapport)),
       ],
     );
   }
@@ -224,7 +223,7 @@ class RapportThermiqueWidget extends StatelessWidget {
                     ),
                   ),
                 )
-                .toList(),
+                ,
           ],
         ),
       ),

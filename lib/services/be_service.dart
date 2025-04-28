@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'be_constants.dart';
+import 'be_security_service.dart';
 
 class BEService {
   // 1. Calcul du volume d'eau du circuit
@@ -139,38 +141,135 @@ class BEService {
     required List<Map<String, dynamic>> radiateurs,
     required List<Map<String, dynamic>> planchers,
   }) {
-    final resultatsRadiateurs = radiateurs.map((r) {
-      final debit = r['puissance'] / (4.18 * r['deltaT']);
-      final pertesCharge = calculerPertesCharge(
-        typeTube: r['typeTube'],
-        longueur: r['longueur'],
-        nombreCoudes: r['nombreCoudes'],
-        debit: debit,
-      );
-      return {
-        'debit': debit,
-        'pertesCharge': pertesCharge['pertesTotales'],
-      };
-    }).toList();
-
-    final resultatsPlanchers = planchers.map((p) {
-      final debit = p['puissance'] / (4.18 * p['deltaT']);
-      final pertesCharge = calculerPertesCharge(
-        typeTube: p['typeTube'],
-        longueur: p['longueur'],
-        nombreCoudes: p['nombreCoudes'],
-        debit: debit,
-      );
-      return {
-        'debit': debit,
-        'pertesCharge': pertesCharge['pertesTotales'],
-      };
-    }).toList();
+    final radiateurResults = _calculerEquilibrageEmetteurs(radiateurs);
+    final planchersResults =
+        _calculerEquilibrageEmetteurs(planchers, isPlancher: true);
 
     return {
-      'radiateurs': resultatsRadiateurs,
-      'planchers': resultatsPlanchers,
+      'radiateurs': radiateurResults,
+      'planchers': planchersResults,
     };
+  }
+
+  // Méthode générique pour calculer l'équilibrage des émetteurs (radiateurs ou planchers)
+  static List<Map<String, dynamic>> _calculerEquilibrageEmetteurs(
+      List<Map<String, dynamic>> emetteurs,
+      {bool isPlancher = false}) {
+    final results = <Map<String, dynamic>>[];
+
+    for (final emetteur in emetteurs) {
+      try {
+        // Extraction des paramètres
+        final puissance = emetteur['puissance'] as double;
+        final deltaT = emetteur['deltaT'] as double;
+        final typeTube = emetteur['typeTube'] as String;
+        final longueur = emetteur['longueur'] as double;
+        final nombreCoudes = emetteur['nombreCoudes'] as int;
+
+        // Calcul du débit
+        final debit = _calculerDebit(puissance, deltaT);
+
+        // Calcul des pertes de charge
+        final rugosite = BEConstants.rugositesMateriaux[typeTube] ?? 0.007;
+        final diametre = isPlancher ? 16.0 : 12.0; // mm
+        final pertesCharge = _calculerPertesCharge(
+          debit: debit,
+          diametre: diametre,
+          longueur: longueur,
+          nombreCoudes: nombreCoudes,
+          rugosite: rugosite,
+        );
+
+        results.add({
+          'debit': debit,
+          'pertesCharge': pertesCharge,
+          'diametre': diametre,
+          'typeTube': typeTube,
+        });
+      } catch (e) {
+        BESecurityService.logSecurityEvent(
+            'erreur', 'Erreur de calcul d\'équilibrage: $e');
+
+        // Ajouter un résultat d'erreur pour ne pas casser l'interface
+        results.add({
+          'debit': 0.0,
+          'pertesCharge': 0.0,
+          'diametre': isPlancher ? 16.0 : 12.0,
+          'typeTube': emetteur['typeTube'] ?? 'per',
+          'erreur': true,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  // Calcul du débit en fonction de la puissance et du delta T
+  static double _calculerDebit(double puissance, double deltaT) {
+    // Q = P / (ρ * Cp * ΔT) * 3600
+    // avec P en kW, ρ = 1 kg/L, Cp = 4.18 kJ/kg/K, ΔT en K
+    return (puissance / (4.18 * deltaT)) * 3600;
+  }
+
+  // Calcul des pertes de charge linéaires et singulières
+  static double _calculerPertesCharge({
+    required double debit,
+    required double diametre,
+    required double longueur,
+    required int nombreCoudes,
+    required double rugosite,
+  }) {
+    // Conversion des unités
+    final debitM3s = debit / 3600; // m³/s
+    final diametreM = diametre / 1000; // m
+
+    // Vitesse d'écoulement (m/s)
+    final section = pi * pow(diametreM / 2, 2);
+    final vitesse = debitM3s / section;
+
+    // Nombre de Reynolds
+    const viscosite = 1.003e-6; // m²/s à 20°C
+    final reynolds = (vitesse * diametreM) / viscosite;
+
+    // Coefficient de perte de charge linéaire (Darcy-Weisbach)
+    final lambda = _calculerLambda(reynolds, rugosite, diametreM);
+
+    // Pertes de charge linéaires (kPa)
+    final pertesLineaires =
+        lambda * (longueur / diametreM) * (pow(vitesse, 2) / 2) * 1000 * 0.001;
+
+    // Pertes de charge singulières (kPa)
+    const kCoude = 0.3; // Coefficient pour un coude standard
+    final pertesSingulieres =
+        nombreCoudes * kCoude * (pow(vitesse, 2) / 2) * 1000 * 0.001;
+
+    // Pertes de charge totales (kPa)
+    return pertesLineaires + pertesSingulieres;
+  }
+
+  // Calcul du coefficient lambda selon la formule de Colebrook-White
+  static double _calculerLambda(
+      double reynolds, double rugosite, double diametre) {
+    if (reynolds < 2300) {
+      // Régime laminaire
+      return 64 / reynolds;
+    } else if (reynolds > 4000) {
+      // Régime turbulent
+      // Approximation de Swamee-Jain
+      final rugositeRelative = (rugosite / 1000) / diametre;
+      return 0.25 /
+          pow(log10(rugositeRelative / 3.7 + 5.74 / pow(reynolds, 0.9)), 2);
+    } else {
+      // Régime transitoire - moyenne pondérée
+      final lambdaLaminaire = 64 / reynolds;
+      final rugositeRelative = (rugosite / 1000) / diametre;
+      final lambdaTurbulent =
+          0.25 / pow(log10(rugositeRelative / 3.7 + 5.74 / pow(4000, 0.9)), 2);
+
+      // Interpolation
+      final factor = (reynolds - 2300) / (4000 - 2300);
+      return lambdaLaminaire * (1 - factor) + lambdaTurbulent * factor;
+    }
   }
 
   // 7. Valeurs ohmiques des sondes

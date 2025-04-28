@@ -357,7 +357,7 @@ class PDFService {
             alignment: pw.Alignment.centerRight,
             child: pw.Text(
               "Généré avec l'application Chauffage Expert®",
-              style: pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
+              style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
             ),
           ),
         ],
@@ -378,7 +378,7 @@ class PDFService {
           level: 0,
           child: pw.Text(
             "Rapport d'Analyse Thermique",
-            style: pw.TextStyle(fontSize: 20),
+            style: const pw.TextStyle(fontSize: 20),
           ),
         ),
         pw.Text(
@@ -547,7 +547,7 @@ class PDFService {
             ...rapport['recommandations'].map(
               (recommandation) => pw.Text(
                 "• $recommandation",
-                style: pw.TextStyle(color: PdfColors.orange),
+                style: const pw.TextStyle(color: PdfColors.orange),
               ),
             ),
           ],

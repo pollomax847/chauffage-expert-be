@@ -161,7 +161,7 @@ class BEGeothermie {
     final puissanceAbsorbee = puissanceHydraulique / (rendement / 100);
 
     // Estimation de la vitesse de rotation (tr/min)
-    final vitesseRotation =
+    const vitesseRotation =
         1450.0; // Vitesse standard pour les pompes de circulation
 
     return {

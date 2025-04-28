@@ -1,9 +1,16 @@
 {
     "version": 2,
-    "builds": [
+    "framework": "flutter",
+    "buildCommand": "flutter build web --release",
+    "outputDirectory": "build/web",
+    "installCommand": "flutter pub get",
+    "env": {
+        "production": "true"
+    },
+    "rewrites": [
         {
-            "src": "Be_chauffage_expert/web/**",
-            "use": "@vercel/static"
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ],
     "headers": [
@@ -12,23 +19,7 @@
             "headers": [
                 {
                     "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                },
-                {
-                    "key": "X-Frame-Options",
-                    "value": "DENY"
-                },
-                {
-                    "key": "X-Content-Type-Options",
-                    "value": "nosniff"
-                },
-                {
-                    "key": "Referrer-Policy",
-                    "value": "strict-origin-when-cross-origin"
-                },
-                {
-                    "key": "Strict-Transport-Security",
-                    "value": "max-age=31536000; includeSubDomains; preload"
+                    "value": "public, max-age=0, must-revalidate"
                 }
             ]
         },
@@ -42,39 +33,42 @@
             ]
         },
         {
-            "source": "/(.*).(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)",
+            "source": "/favicon.png",
             "headers": [
                 {
                     "key": "Cache-Control",
                     "value": "public, max-age=31536000, immutable"
+                },
+                {
+                    "key": "Content-Type",
+                    "value": "image/png"
+                }
+            ]
+        },
+        {
+            "source": "/favicon.ico",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                },
+                {
+                    "key": "Content-Type",
+                    "value": "image/x-icon"
                 }
             ]
         }
     ],
-    "redirects": [
+    "builds": [
         {
-            "source": "/api/:path*",
-            "destination": "https://api.chauffage-expert.com/:path*",
-            "permanent": true
-        },
-        {
-            "source": "/docs",
-            "destination": "https://docs.chauffage-expert.com",
-            "permanent": true
+            "src": "build/web/**",
+            "use": "@vercel/static"
         }
     ],
-    "rewrites": [
+    "routes": [
         {
-            "source": "/(.*)",
-            "destination": "/Be_chauffage_expert/web/index.html"
+            "src": "/(.*)",
+            "dest": "/index.html"
         }
-    ],
-    "env": {
-        "APP_ENV": "production",
-        "API_URL": "https://api.chauffage-expert.com",
-        "STORAGE_BUCKET": "chauffage-expert-files-prod"
-    },
-    "regions": [
-        "cdg1"
     ]
 }

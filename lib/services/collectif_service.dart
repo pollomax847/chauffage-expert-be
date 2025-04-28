@@ -287,7 +287,7 @@ class CollectifService {
     final puissanceAbsorbee = puissanceHydraulique / 0.7;
 
     // Vitesse de rotation (tr/min)
-    final vitesseRotation = 1450.0;
+    const vitesseRotation = 1450.0;
 
     return {
       'deltaT': deltaT,
@@ -336,7 +336,7 @@ class CollectifService {
     final hauteurTotale = hauteurManometrique + (pertesCharge * 10.2);
     final puissanceHydraulique = (debitVolumique * hauteurTotale * 9.81) / 3600;
     final puissanceAbsorbee = puissanceHydraulique / 0.7;
-    final vitesseRotation = 1450.0;
+    const vitesseRotation = 1450.0;
 
     return {
       'pertesCharge': pertesCharge,
@@ -355,7 +355,7 @@ class CollectifService {
     final pressionTotale = pressionMinimale + (hauteurTotale * 0.1);
     final puissanceHydraulique = (debitTotal * pressionTotale * 0.1) / 3.6;
     final puissanceAbsorbee = puissanceHydraulique / 0.7;
-    final vitesseRotation = 1450.0;
+    const vitesseRotation = 1450.0;
 
     return {
       'pressionTotale': pressionTotale,

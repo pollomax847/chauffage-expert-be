@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 class BEDepartitions {
   // Coefficients de déperdition selon l'année de construction

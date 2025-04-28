@@ -73,6 +73,7 @@ dependencies:
   # Path
   path: ^1.8.3
 
+  crypto: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

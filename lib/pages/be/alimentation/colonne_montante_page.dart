@@ -95,7 +95,7 @@ class _ColonneMontantePageState extends ConsumerState<ColonneMontantePage> {
                     ],
                   ),
                 );
-              }).toList(),
+              }),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _nombreLogementsController,
@@ -203,7 +203,7 @@ class _ColonneMontantePageState extends ConsumerState<ColonneMontantePage> {
                           label: entry.key.replaceAll('_', ' '),
                           valeur: '${entry.value.toStringAsFixed(2)} L/s',
                         ))
-                    .toList(),
+                    ,
               ],
             ],
           ),

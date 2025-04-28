@@ -24,7 +24,7 @@ class _VMCPageState extends ConsumerState<VMCPage> {
   double _longueur = 0;
   double _diametre = 0;
   int _nombreCoudes = 0;
-  double _rendement = 0.7;
+  final double _rendement = 0.7;
   int _nombreLogements = 0;
   double _tauxOccupation = 0.7;
   String _typeVMC = 'simple flux';
@@ -190,7 +190,7 @@ class _VMCPageState extends ConsumerState<VMCPage> {
                           },
                         ),
                       );
-                    }).toList(),
+                    }),
                     const SizedBox(height: 16),
                     TextFormField(
                       decoration: const InputDecoration(

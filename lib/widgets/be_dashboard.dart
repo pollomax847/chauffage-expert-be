@@ -1,8 +1,6 @@
 // widgets/be_dashboard.dart
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:provider/provider.dart';
-import '../services/be_coordination_service.dart';
 import '../services/be_notification_service.dart';
 
 class BEDashboard extends StatefulWidget {

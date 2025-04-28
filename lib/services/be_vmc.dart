@@ -56,7 +56,7 @@ class BEVMC {
         lambda * (longueur / (diametre / 1000)) * pow(vitesse, 2) / 2 * 1.2;
 
     // Pertes de charge singulières (Pa)
-    final kCoude = 0.3;
+    const kCoude = 0.3;
     final pertesSingulieres = nombreCoudes * kCoude * pow(vitesse, 2) / 2 * 1.2;
 
     // Pertes de charge totales (Pa)

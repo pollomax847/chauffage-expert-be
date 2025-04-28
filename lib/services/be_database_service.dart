@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'be_project_service.dart';
 import 'be_security_service.dart';
 
 class BEDatabaseService {
-  static final String _apiUrl = 'https://api.be-calculator.com';
-  static final String _apiKey = 'YOUR_API_KEY'; // À remplacer par une vraie clé
+  static const String _apiUrl = 'https://api.be-calculator.com';
+  static const String _apiKey = 'YOUR_API_KEY'; // À remplacer par une vraie clé
   static final Map<String, Map<String, dynamic>> _localCache = {};
   static String? _databaseFilePath;
   static const String _localFile = 'be_database.json';

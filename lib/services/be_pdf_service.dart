@@ -1,9 +1,6 @@
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:flutter/material.dart';
 import 'be_security_service.dart';
 import 'be_schema_service.dart';
 
@@ -227,7 +224,7 @@ class BEPDFService {
     final body = pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Module: $moduleName', style: pw.TextStyle(fontSize: 20)),
+        pw.Text('Module: $moduleName', style: const pw.TextStyle(fontSize: 20)),
         pw.SizedBox(height: 20),
         pw.Table(
           border: pw.TableBorder.all(),
@@ -375,7 +372,7 @@ class BEPDFService {
               pw.SizedBox(height: 20),
               pw.Text(
                 'Date: ${DateTime.now().toString()}',
-                style: pw.TextStyle(fontSize: 12),
+                style: const pw.TextStyle(fontSize: 12),
               ),
               pw.SizedBox(height: 20),
               if (contexteProjet != null) ...[
@@ -470,7 +467,7 @@ class BEPDFService {
               pw.SizedBox(height: 20),
               pw.Text(
                 'Document généré par BE - Hash: ${_genererHash(module, parametres, resultats)}',
-                style: pw.TextStyle(fontSize: 8),
+                style: const pw.TextStyle(fontSize: 8),
               ),
             ],
           ),

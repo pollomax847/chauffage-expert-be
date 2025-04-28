@@ -150,9 +150,9 @@ class BE3CEP {
         (debitVMC * 1.2 * 100) / 1000 * dureeUtilisation; // 1.2 kg/m³, 100 Pa
 
     // Économies potentielles (%)
-    final economieChauffage = 0.15; // 15% avec une PAC
-    final economieECS = 0.20; // 20% avec un ballon thermodynamique
-    final economieVMC = 0.30; // 30% avec une VMC double flux
+    const economieChauffage = 0.15; // 15% avec une PAC
+    const economieECS = 0.20; // 20% avec un ballon thermodynamique
+    const economieVMC = 0.30; // 30% avec une VMC double flux
 
     return {
       'consommation': {
@@ -195,7 +195,7 @@ class BE3CEP {
         puissanceNominale * (debitsFumees[typeCombustible] ?? 0.8);
 
     // Calcul de la section minimale (m²)
-    final vitesseFumee = 2.0; // m/s (vitesse recommandée)
+    const vitesseFumee = 2.0; // m/s (vitesse recommandée)
     final sectionMinimale = (debitFumees / 3600) / vitesseFumee;
 
     // Calcul du diamètre minimal (mm)
@@ -209,13 +209,13 @@ class BE3CEP {
     );
 
     // Calcul de la dépression naturelle (Pa)
-    final densiteAir = 1.293; // kg/m³
+    const densiteAir = 1.293; // kg/m³
     final densiteFumee = 1.293 * (273 / (273 + temperatureFumee));
     final depressionNaturelle =
         hauteurConduit * 9.81 * (densiteAir - densiteFumee);
 
     // Vérification de la dépression
-    final depressionMinimale = 10.0; // Pa
+    const depressionMinimale = 10.0; // Pa
     final depressionOK = depressionNaturelle >= depressionMinimale;
 
     // Recommandations
@@ -304,7 +304,7 @@ class BE3CEP {
         lambda * (longueur / (diametre / 1000)) * pow(vitesse, 2) / 2 * 1.2;
 
     // Pertes de charge singulières (Pa)
-    final kCoude = 0.3;
+    const kCoude = 0.3;
     final pertesSingulieres = nombreCoudes * kCoude * pow(vitesse, 2) / 2 * 1.2;
 
     // Pertes de charge totales (Pa)
@@ -348,7 +348,7 @@ class BE3CEP {
     final hauteurMinimale = max(4.0, hauteurBatiment * 0.1);
     final hauteurOK = hauteurConduit >= hauteurMinimale;
 
-    final distanceMinimale = 3.0;
+    const distanceMinimale = 3.0;
     final distanceOK = distanceObstacle >= distanceMinimale;
 
     List<String> recommandations = [];

@@ -1,7 +1,4 @@
 // services/be_schema_service.dart
-import 'dart:convert';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 
 class BESchemaService {
   static const Map<String, Map<String, String>> _themes = {
@@ -92,12 +89,12 @@ class BESchemaService {
         <!-- Chaudière -->
         <rect x="50" y="150" width="100" height="100" fill="${theme['chaudiere']}" stroke="${theme['bordure']}" stroke-width="2"/>
         <text x="100" y="200" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          Chaudière ${puissance} kW
+          Chaudière $puissance kW
         </text>
         <!-- Circuit de distribution -->
         <path d="M150,200 L300,200" stroke="${theme['circuit']}" stroke-width="4" fill="none"/>
         <text x="225" y="190" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${temperatureDepart}°C
+          $temperatureDepart°C
         </text>
         <!-- Radiateurs -->
         <rect x="300" y="100" width="50" height="100" fill="${theme['radiateur']}" stroke="${theme['bordure']}" stroke-width="2"/>
@@ -105,7 +102,7 @@ class BESchemaService {
         <!-- Circuit de retour -->
         <path d="M300,200 L150,200" stroke="${theme['retour']}" stroke-width="4" fill="none"/>
         <text x="225" y="210" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${temperatureRetour}°C
+          $temperatureRetour°C
         </text>
       </svg>
     ''';
@@ -126,12 +123,12 @@ class BESchemaService {
           Chaudière 3CEP
         </text>
         <text x="100" y="200" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${puissance} kW (${rendement}%)
+          $puissance kW ($rendement%)
         </text>
         <!-- Circuit de distribution -->
         <path d="M150,200 L300,200" stroke="${theme['circuit']}" stroke-width="4" fill="none"/>
         <text x="225" y="190" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${temperatureDepart}°C
+          $temperatureDepart°C
         </text>
         <!-- Radiateurs -->
         <rect x="300" y="100" width="50" height="100" fill="${theme['radiateur']}" stroke="${theme['bordure']}" stroke-width="2"/>
@@ -139,7 +136,7 @@ class BESchemaService {
         <!-- Circuit de retour -->
         <path d="M300,200 L150,200" stroke="${theme['retour']}" stroke-width="4" fill="none"/>
         <text x="225" y="210" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${temperatureRetour}°C
+          $temperatureRetour°C
         </text>
       </svg>
     ''';
@@ -157,22 +154,22 @@ class BESchemaService {
         <!-- Panneaux solaires -->
         <rect x="50" y="50" width="200" height="50" fill="${theme['solaire']}" stroke="${theme['bordure']}" stroke-width="2"/>
         <text x="150" y="80" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          Panneaux solaires (${surface} m²)
+          Panneaux solaires ($surface m²)
         </text>
         <!-- Circuit solaire -->
         <path d="M250,75 L350,75" stroke="${theme['circuit']}" stroke-width="4" fill="none"/>
         <text x="300" y="65" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${temperatureDepart}°C
+          $temperatureDepart°C
         </text>
         <!-- Ballon de stockage -->
         <rect x="350" y="100" width="100" height="200" fill="${theme['reservoir']}" stroke="${theme['bordure']}" stroke-width="2"/>
         <text x="400" y="200" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          Ballon ${puissance} kW
+          Ballon $puissance kW
         </text>
         <!-- Circuit de retour -->
         <path d="M350,75 L250,75" stroke="${theme['retour']}" stroke-width="4" fill="none"/>
         <text x="300" y="85" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${temperatureRetour}°C
+          $temperatureRetour°C
         </text>
       </svg>
     ''';
@@ -189,17 +186,17 @@ class BESchemaService {
         <!-- VMC -->
         <rect x="250" y="150" width="100" height="100" fill="${theme['ventilation']}" stroke="${theme['bordure']}" stroke-width="2"/>
         <text x="300" y="200" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          VMC ${debit} m³/h
+          VMC $debit m³/h
         </text>
         <!-- Entrées d'air -->
         <path d="M150,200 L250,200" stroke="${theme['circuit']}" stroke-width="4" fill="none"/>
         <text x="200" y="190" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${temperatureEntree}°C
+          $temperatureEntree°C
         </text>
         <!-- Sorties d'air -->
         <path d="M350,200 L450,200" stroke="${theme['retour']}" stroke-width="4" fill="none"/>
         <text x="400" y="190" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${temperatureSortie}°C
+          $temperatureSortie°C
         </text>
       </svg>
     ''';
@@ -216,17 +213,17 @@ class BESchemaService {
         <!-- Réservoir -->
         <rect x="50" y="100" width="100" height="200" fill="${theme['reservoir']}" stroke="${theme['bordure']}" stroke-width="2"/>
         <text x="100" y="200" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          Réservoir ${volume} L
+          Réservoir $volume L
         </text>
         <!-- Pompe -->
         <rect x="200" y="175" width="50" height="50" fill="${theme['pompe']}" stroke="${theme['bordure']}" stroke-width="2"/>
         <text x="225" y="200" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${debit} L/min
+          $debit L/min
         </text>
         <!-- Circuit de distribution -->
         <path d="M250,200 L400,200" stroke="${theme['circuit']}" stroke-width="4" fill="none"/>
         <text x="325" y="190" text-anchor="middle" fill="${theme['texte']}" font-family="Arial" font-size="12">
-          ${pression} bar
+          $pression bar
         </text>
         <!-- Points de puisage -->
         <rect x="400" y="150" width="50" height="100" fill="${theme['radiateur']}" stroke="${theme['bordure']}" stroke-width="2"/>
