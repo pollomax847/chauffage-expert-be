@@ -3,12 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import '../models/radiateur.dart';
 import '../services/analyse_thermique_service.dart';
-import '../services/pdf_service.dart';
+import '../services/be_pdf_service.dart';
 
 class RapportThermiqueWidget extends StatelessWidget {
   final List<Radiateur> radiateurs;
+  final List<double> besoinsThermiques;
+  final List<String> materiauxTuyauterie;
+  final List<String> identifications;
+  final List<String?> modeles;
 
-  const RapportThermiqueWidget({super.key, required this.radiateurs});
+  const RapportThermiqueWidget({
+    super.key,
+    required this.radiateurs,
+    required this.besoinsThermiques,
+    required this.materiauxTuyauterie,
+    required this.identifications,
+    required this.modeles,
+  });
 
   Future<void> _genererEtTelechargerPDF(BuildContext context) async {
     try {
@@ -24,8 +35,12 @@ class RapportThermiqueWidget extends StatelessWidget {
         'date': DateTime.now().toLocal().toString().split(' ')[0],
       };
 
-      final pdf = await PDFService.genererRapportThermiquePDF(
+      final pdf = await BEPdfService.genererRapportThermiquePDF(
         radiateurs: radiateurs,
+        besoinsThermiques: besoinsThermiques,
+        materiauxTuyauterie: materiauxTuyauterie,
+        identifications: identifications,
+        modeles: modeles,
         entreprise: entreprise,
         client: client,
       );
@@ -48,6 +63,10 @@ class RapportThermiqueWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final rapportGlobal = AnalyseThermiqueService.genererRapportGlobal(
       radiateurs,
+      besoinsThermiques,
+      materiauxTuyauterie,
+      identifications,
+      modeles,
     );
     final synthese = rapportGlobal['synthese'] as Map<String, dynamic>;
 
@@ -213,17 +232,15 @@ class RapportThermiqueWidget extends StatelessWidget {
             ),
             _buildInfoRow('Matériau', rapport['materiauTuyauterie']),
             const SizedBox(height: 8),
-            ...(rapport['recommandations'] as List)
-                .map(
-                  (recommandation) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      '• $recommandation',
-                      style: const TextStyle(color: Colors.orange),
-                    ),
-                  ),
-                )
-                ,
+            ...(rapport['recommandations'] as List).map(
+              (recommandation) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '• $recommandation',
+                  style: const TextStyle(color: Colors.orange),
+                ),
+              ),
+            ),
           ],
         ),
       ),

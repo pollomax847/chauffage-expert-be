@@ -14,7 +14,13 @@ class RapportThermiquePage extends StatelessWidget {
         title: const Text('Rapport d\'analyse thermique'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: RapportThermiqueWidget(radiateurs: radiateurs),
+      body: RapportThermiqueWidget(
+        radiateurs: radiateurs,
+        besoinsThermiques: [], // Provide appropriate data
+        materiauxTuyauterie: [], // Provide appropriate data
+        identifications: [], // Provide appropriate data
+        modeles: [], // Provide appropriate data
+      ),
     );
   }
 }

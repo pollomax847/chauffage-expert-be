@@ -1,9 +1,10 @@
 import '../models/radiateur.dart';
+import '../models/etude.dart';
 
 class AnalyseThermiqueService {
   // Vérifie si la puissance du radiateur est suffisante
-  static bool verifierPuissance(Radiateur radiateur) {
-    return radiateur.puissance >= radiateur.besoinThermique;
+  static bool verifierPuissance(Radiateur radiateur, double besoinThermique) {
+    return radiateur.puissance >= besoinThermique;
   }
 
   // Vérifie si le matériau de tuyauterie est adapté
@@ -13,28 +14,36 @@ class AnalyseThermiqueService {
   }
 
   // Calcule la marge de puissance
-  static double calculerMargePuissance(Radiateur radiateur) {
-    return radiateur.puissance - radiateur.besoinThermique;
+  static double calculerMargePuissance(
+      Radiateur radiateur, double besoinThermique) {
+    return radiateur.puissance - besoinThermique;
   }
 
   // Génère un rapport d'analyse pour un radiateur
-  static Map<String, dynamic> genererRapportRadiateur(Radiateur radiateur) {
-    final puissanceSuffisante = verifierPuissance(radiateur);
-    final materiauAdapte = verifierMateriauTuyauterie(
-      radiateur.materiauTuyauterie,
-    );
-    final margePuissance = calculerMargePuissance(radiateur);
+  static Map<String, dynamic> genererRapportRadiateur(
+    Radiateur radiateur,
+    double besoinThermique,
+    String materiauTuyauterie,
+    String identification,
+    String? modele,
+  ) {
+    final puissanceSuffisante = verifierPuissance(radiateur, besoinThermique);
+    final materiauAdapte = verifierMateriauTuyauterie(materiauTuyauterie);
+    final margePuissance = calculerMargePuissance(radiateur, besoinThermique);
+
+    final dimensions =
+        '${radiateur.largeur}x${radiateur.hauteur}x${radiateur.profondeur} mm';
 
     return {
       'reference': radiateur.reference,
-      'identification': radiateur.identification,
-      'modele': radiateur.modele,
-      'dimensions': radiateur.dimensions,
+      'identification': identification,
+      'modele': modele ?? radiateur.reference,
+      'dimensions': dimensions,
       'puissance': radiateur.puissance,
-      'besoinThermique': radiateur.besoinThermique,
+      'besoinThermique': besoinThermique,
       'margePuissance': margePuissance,
       'puissanceSuffisante': puissanceSuffisante,
-      'materiauTuyauterie': radiateur.materiauTuyauterie,
+      'materiauTuyauterie': materiauTuyauterie,
       'materiauAdapte': materiauAdapte,
       'recommandations': _genererRecommandations(
         puissanceSuffisante,
@@ -71,20 +80,44 @@ class AnalyseThermiqueService {
     return recommandations;
   }
 
-  // Génère un rapport global pour une liste de radiateurs
-  static Map<String, dynamic> genererRapportGlobal(List<Radiateur> radiateurs) {
-    final rapports = radiateurs.map(genererRapportRadiateur).toList();
+  // Génère un rapport global pour une liste de radiateurs avec informations supplémentaires
+  static Map<String, dynamic> genererRapportGlobal(
+    List<Radiateur> radiateurs,
+    List<double> besoinsThermiques,
+    List<String> materiauxTuyauterie,
+    List<String> identifications,
+    List<String?> modeles,
+  ) {
+    if (radiateurs.length != besoinsThermiques.length ||
+        radiateurs.length != materiauxTuyauterie.length ||
+        radiateurs.length != identifications.length ||
+        radiateurs.length != modeles.length) {
+      throw ArgumentError('Toutes les listes doivent avoir la même longueur');
+    }
+
+    final rapports = <Map<String, dynamic>>[];
+
+    for (var i = 0; i < radiateurs.length; i++) {
+      rapports.add(genererRapportRadiateur(
+        radiateurs[i],
+        besoinsThermiques[i],
+        materiauxTuyauterie[i],
+        identifications[i],
+        modeles[i],
+      ));
+    }
+
     final nombreRadiateurs = radiateurs.length;
-    final nombreConformes =
-        rapports
-            .where((r) => r['puissanceSuffisante'] && r['materiauAdapte'])
-            .length;
+    final nombreConformes = rapports
+        .where((r) => r['puissanceSuffisante'] && r['materiauAdapte'])
+        .length;
 
     return {
       'nombreRadiateurs': nombreRadiateurs,
       'nombreConformes': nombreConformes,
-      'tauxConformite': (nombreConformes / nombreRadiateurs * 100)
-          .toStringAsFixed(1),
+      'tauxConformite': nombreRadiateurs > 0
+          ? (nombreConformes / nombreRadiateurs * 100).toStringAsFixed(1)
+          : '0.0',
       'rapportsDetaille': rapports,
       'synthese': _genererSynthese(rapports),
     };
@@ -107,10 +140,9 @@ class AnalyseThermiqueService {
       'puissanceTotale': puissanceTotale,
       'besoinTotal': besoinTotal,
       'margeTotale': puissanceTotale - besoinTotal,
-      'nombreNonConformes':
-          rapports
-              .where((r) => !r['puissanceSuffisante'] || !r['materiauAdapte'])
-              .length,
+      'nombreNonConformes': rapports
+          .where((r) => !r['puissanceSuffisante'] || !r['materiauAdapte'])
+          .length,
     };
   }
 }

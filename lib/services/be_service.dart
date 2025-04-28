@@ -258,13 +258,13 @@ class BEService {
       // Approximation de Swamee-Jain
       final rugositeRelative = (rugosite / 1000) / diametre;
       return 0.25 /
-          pow(log10(rugositeRelative / 3.7 + 5.74 / pow(reynolds, 0.9)), 2);
+          pow(log(rugositeRelative / 3.7 + 5.74 / pow(reynolds, 0.9)) / ln10, 2);
     } else {
       // Régime transitoire - moyenne pondérée
       final lambdaLaminaire = 64 / reynolds;
       final rugositeRelative = (rugosite / 1000) / diametre;
       final lambdaTurbulent =
-          0.25 / pow(log10(rugositeRelative / 3.7 + 5.74 / pow(4000, 0.9)), 2);
+          0.25 / pow(log(rugositeRelative / 3.7 + 5.74 / pow(4000, 0.9)), 2);
 
       // Interpolation
       final factor = (reynolds - 2300) / (4000 - 2300);

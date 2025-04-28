@@ -1,5 +1,7 @@
 // services/be_coordination_service.dart
 import 'dart:async';
+import 'package:flutter/foundation.dart';
+
 import 'be_chauffage.dart';
 import 'be_hydraulique.dart';
 import 'be_vmc.dart';
@@ -80,9 +82,9 @@ class BECoordinationService {
         final resultat = await _executerCalcul(module, parametres);
 
         // Vérification de l'intégrité du résultat
-        if (!BESecurityService.validateResult(
+        if (!BESecurityService.validateResults(
           module: module,
-          result: resultat,
+          results: resultat,
         )) {
           throw Exception('Résultat invalide pour le module: $module');
         }
@@ -124,7 +126,7 @@ class BECoordinationService {
         _derniersCalculs[cacheKey] = DateTime.now();
 
         // Génération du rapport PDF
-        final rapportPath = await BEPDFService.genererRapport(
+        final rapportPath = await BEPdfService.genererRapport(
           module: module,
           parametres: parametres,
           resultats: resultat,
@@ -237,146 +239,154 @@ class BECoordinationService {
   static Future<Map<String, dynamic>> _calculerChauffage(
     Map<String, dynamic> parametres,
   ) async {
-    // Calcul des déperditions
-    final deperditions = BEChauffage.calculerDeperditions(
-      surfaces: parametres['surfaces'],
-      zoneClimatique: parametres['zoneClimatique'],
-      temperatureInterieure: parametres['temperatureInterieure'],
-      temperatureExterieure: parametres['temperatureExterieure'],
-    );
+    try {
+      // Calcul des déperditions
+      final deperditions = BEChauffage.calculerDeperditions(
+        surfaces: parametres['surfaces'],
+        zoneClimatique: parametres['zoneClimatique'],
+        temperatureInterieure: parametres['temperatureInterieure'],
+        temperatureExterieure: parametres['temperatureExterieure'],
+      );
 
-    // Validation des résultats
-    final hashDeperditions = BESecurityService.hashData(deperditions);
-    await BESecurityService.logSecurityEvent(
-      'calcul',
-      'Calcul des déperditions terminé - Hash: $hashDeperditions',
-    );
+      // Validation des résultats
+      final hashDeperditions = BESecurityService.hashData(deperditions);
+      await BESecurityService.logSecurityEvent(
+        'calcul',
+        'Calcul des déperditions terminé - Hash: $hashDeperditions',
+      );
 
-    // Notification si les déperditions sont élevées
-    if (double.parse(deperditions['deperditionsTotales']) > 10000) {
-      _notificationService.notify(
-        type: 'alerte',
-        message: 'Les déperditions thermiques sont supérieures à 10 kW',
+      // Notification si les déperditions sont élevées
+      if (double.parse(deperditions['deperditionsTotales']) > 10000) {
+        await _notificationService.notify(
+          type: 'alerte',
+          message: 'Les déperditions thermiques sont supérieures à 10 kW',
+          data: {
+            'module': 'chauffage',
+            'deperditions': deperditions,
+          },
+        );
+      }
+
+      // Calcul hydraulique
+      final hydraulique = BEHydraulique.calculerDebitProbable(
+        typeBatiment: parametres['typeBatiment'],
+        appareils: parametres['appareils'],
+      );
+
+      // Validation des résultats hydrauliques
+      final hashHydraulique = BESecurityService.hashData(hydraulique);
+      await BESecurityService.logSecurityEvent(
+        'calcul',
+        'Calcul hydraulique terminé - Hash: $hashHydraulique',
+      );
+
+      // Calcul VMC
+      final vmc = BEVMC.calculerDebitVMC(
+        volumeHabitable: parametres['volumeHabitable'],
+        typeVMC: parametres['typeVMC'],
+        nombrePieces: parametres['nombrePieces'],
+      );
+
+      // Validation des résultats VMC
+      final hashVMC = BESecurityService.hashData(vmc);
+      await BESecurityService.logSecurityEvent(
+        'calcul',
+        'Calcul VMC terminé - Hash: $hashVMC',
+      );
+
+      // Calcul géothermie
+      final geothermie = BEGeothermie.calculerPuissance(
+        puissanceCalculee: double.parse(deperditions['deperditionsTotales']),
+        typeCaptage: parametres['typeCaptage'],
+        surfaceTerrain: parametres['surfaceTerrain'],
+      );
+
+      // Validation des résultats géothermie
+      final hashGeothermie = BESecurityService.hashData(geothermie);
+      await BESecurityService.logSecurityEvent(
+        'calcul',
+        'Calcul géothermie terminé - Hash: $hashGeothermie',
+      );
+
+      // Calcul régulation
+      final regulation = BERegulation.calculerParametres(
+        puissanceChaudiere: double.parse(deperditions['deperditionsTotales']),
+        typeRegulation: parametres['typeRegulation'],
+        nombreZones: parametres['nombreZones'],
+      );
+
+      // Validation des résultats régulation
+      final hashRegulation = BESecurityService.hashData(regulation);
+      await BESecurityService.logSecurityEvent(
+        'calcul',
+        'Calcul régulation terminé - Hash: $hashRegulation',
+      );
+
+      // Calcul alimentation électrique
+      final alimentation = BEAlimentation.calculerPuissanceElectrique(
+        puissanceThermique: double.parse(deperditions['deperditionsTotales']),
+        typeSysteme: parametres['typeSysteme'],
+      );
+
+      // Validation des résultats alimentation
+      final hashAlimentation = BESecurityService.hashData(alimentation);
+      await BESecurityService.logSecurityEvent(
+        'calcul',
+        'Calcul alimentation terminé - Hash: $hashAlimentation',
+      );
+
+      // Calcul évacuation
+      final evacuation = BEEvacuation.calculerDimensionnement(
+        puissanceChaudiere: double.parse(deperditions['deperditionsTotales']),
+        typeEvacuation: parametres['typeEvacuation'],
+      );
+
+      // Validation des résultats évacuation
+      final hashEvacuation = BESecurityService.hashData(evacuation);
+      await BESecurityService.logSecurityEvent(
+        'calcul',
+        'Calcul évacuation terminé - Hash: $hashEvacuation',
+      );
+
+      // Création du rapport final
+      final rapport = {
+        'deperditions': deperditions,
+        'hydraulique': hydraulique,
+        'vmc': vmc,
+        'geothermie': geothermie,
+        'regulation': regulation,
+        'alimentation': alimentation,
+        'evacuation': evacuation,
+        'timestamp': DateTime.now().toIso8601String(),
+        'hash': BESecurityService.hashData({
+          'deperditions': hashDeperditions,
+          'hydraulique': hashHydraulique,
+          'vmc': hashVMC,
+          'geothermie': hashGeothermie,
+          'regulation': hashRegulation,
+          'alimentation': hashAlimentation,
+          'evacuation': hashEvacuation,
+        }),
+      };
+
+      // Notification de fin de calcul
+      await _notificationService.notify(
+        type: 'calcul',
+        message: 'Tous les calculs ont été effectués avec succès',
         data: {
-          'module': 'chauffage',
-          'deperditions': deperditions,
+          'module': 'coordination',
+          'rapport': rapport,
         },
       );
+
+      return rapport;
+    } catch (e) {
+      await BESecurityService.logSecurityEvent(
+        'erreur',
+        'Erreur lors du calcul du chauffage: $e',
+      );
+      rethrow;
     }
-
-    // Calcul hydraulique
-    final hydraulique = BEHydraulique.calculerDebitProbable(
-      typeBatiment: parametres['typeBatiment'],
-      appareils: parametres['appareils'],
-    );
-
-    // Validation des résultats hydrauliques
-    final hashHydraulique = BESecurityService.hashData(hydraulique);
-    await BESecurityService.logSecurityEvent(
-      'calcul',
-      'Calcul hydraulique terminé - Hash: $hashHydraulique',
-    );
-
-    // Calcul VMC
-    final vmc = BEVMC.calculerDebitVMC(
-      volumeHabitable: parametres['volumeHabitable'],
-      typeVMC: parametres['typeVMC'],
-      nombrePieces: parametres['nombrePieces'],
-    );
-
-    // Validation des résultats VMC
-    final hashVMC = BESecurityService.hashData(vmc);
-    await BESecurityService.logSecurityEvent(
-      'calcul',
-      'Calcul VMC terminé - Hash: $hashVMC',
-    );
-
-    // Calcul géothermie
-    final geothermie = BEGeothermie.calculerPuissance(
-      puissanceCalculee: double.parse(deperditions['deperditionsTotales']),
-      typeCaptage: parametres['typeCaptage'],
-      surfaceTerrain: parametres['surfaceTerrain'],
-    );
-
-    // Validation des résultats géothermie
-    final hashGeothermie = BESecurityService.hashData(geothermie);
-    await BESecurityService.logSecurityEvent(
-      'calcul',
-      'Calcul géothermie terminé - Hash: $hashGeothermie',
-    );
-
-    // Calcul régulation
-    final regulation = BERegulation.calculerParametres(
-      puissanceChaudiere: double.parse(deperditions['deperditionsTotales']),
-      typeRegulation: parametres['typeRegulation'],
-      nombreZones: parametres['nombreZones'],
-    );
-
-    // Validation des résultats régulation
-    final hashRegulation = BESecurityService.hashData(regulation);
-    await BESecurityService.logSecurityEvent(
-      'calcul',
-      'Calcul régulation terminé - Hash: $hashRegulation',
-    );
-
-    // Calcul alimentation électrique
-    final alimentation = BEAlimentation.calculerPuissanceElectrique(
-      puissanceThermique: double.parse(deperditions['deperditionsTotales']),
-      typeSysteme: parametres['typeSysteme'],
-    );
-
-    // Validation des résultats alimentation
-    final hashAlimentation = BESecurityService.hashData(alimentation);
-    await BESecurityService.logSecurityEvent(
-      'calcul',
-      'Calcul alimentation terminé - Hash: $hashAlimentation',
-    );
-
-    // Calcul évacuation
-    final evacuation = BEEvacuation.calculerDimensionnement(
-      puissanceChaudiere: double.parse(deperditions['deperditionsTotales']),
-      typeEvacuation: parametres['typeEvacuation'],
-    );
-
-    // Validation des résultats évacuation
-    final hashEvacuation = BESecurityService.hashData(evacuation);
-    await BESecurityService.logSecurityEvent(
-      'calcul',
-      'Calcul évacuation terminé - Hash: $hashEvacuation',
-    );
-
-    // Création du rapport final
-    final rapport = {
-      'deperditions': deperditions,
-      'hydraulique': hydraulique,
-      'vmc': vmc,
-      'geothermie': geothermie,
-      'regulation': regulation,
-      'alimentation': alimentation,
-      'evacuation': evacuation,
-      'timestamp': DateTime.now().toIso8601String(),
-      'hash': BESecurityService.hashData({
-        'deperditions': hashDeperditions,
-        'hydraulique': hashHydraulique,
-        'vmc': hashVMC,
-        'geothermie': hashGeothermie,
-        'regulation': hashRegulation,
-        'alimentation': hashAlimentation,
-        'evacuation': hashEvacuation,
-      }),
-    };
-
-    // Notification de fin de calcul
-    _notificationService.notify(
-      type: 'calcul',
-      message: 'Tous les calculs ont été effectués avec succès',
-      data: {
-        'module': 'coordination',
-        'rapport': rapport,
-      },
-    );
-
-    return rapport;
   }
 
   static Future<Map<String, dynamic>> _calculerHydraulique(

@@ -1,33 +1,55 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_it/get_it.dart';
 
-import 'client_db.dart';
-import 'be_pdf_service.dart';
-import 'be_logic.dart';
-import 'be_hydraulique.dart';
-import 'be_schema_service.dart';
-import 'be_validation_service.dart';
-import 'configuration_service.dart';
+import '../services/client_db.dart';
+import '../services/be_pdf_service.dart';
+import '../services/be_logic.dart';
+import '../services/configuration_service.dart';
+import '../services/be_security_service.dart';
 
 /// Service d'initialisation qui configure toutes les dépendances
 /// de l'application au démarrage
 class InitializationService {
+  static final GetIt _getIt = GetIt.instance;
+
   static Future<void> initialize() async {
-    // Initialiser les préférences partagées
-    final prefs = await SharedPreferences.getInstance();
+    try {
+      // Initialiser les préférences partagées
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Enregistrer les services dans GetIt pour l'injection de dépendances
+      if (!_getIt.isRegistered<SharedPreferences>()) {
+        _getIt.registerSingleton<SharedPreferences>(prefs);
+      }
+      
+      if (!_getIt.isRegistered<ConfigurationService>()) {
+        _getIt.registerSingleton<ConfigurationService>(ConfigurationService(prefs));
+      }
+      
+      if (!_getIt.isRegistered<ClientDbService>()) {
+        _getIt.registerSingleton<ClientDbService>(ClientDbService());
+      }
+      
+      if (!_getIt.isRegistered<BEPdfService>()) {
+        _getIt.registerSingleton<BEPdfService>(BEPdfService());
+      }
+      
+      if (!_getIt.isRegistered<BELogic>()) {
+        _getIt.registerSingleton<BELogic>(BELogic());
+      }
 
-    // Initialiser les services
-    final configurationService = ConfigurationService(prefs);
-    final clientDb = ClientDbService();
-    final pdfService = BEPdfService();
-    final logicService = BELogic();
+      // Enregistrer les événements de démarrage
+      await BESecurityService.logSecurityEvent(
+          'initialisation', 'Application initialisée avec succès');
+      print('Application initialisée avec succès');
 
-    // Enregistrer les événements de démarrage
-    print('Application initialisée avec succès');
-
-    // Initialisation des autres composants
-    await _initializeProviders();
-    await _initializeTheme();
-    await _prepareLocalStorage();
+      // Initialisation des autres composants
+      await _initializeProviders();
+      await _initializeTheme();
+      await _prepareLocalStorage();
+    } catch (e) {
+      print('Erreur lors de l\'initialisation: $e');
+    }
   }
 
   /// Initialise les providers Riverpod

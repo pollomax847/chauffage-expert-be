@@ -9,11 +9,11 @@ import 'pages/reglementation_page.dart';
 import 'pages/export_page.dart';
 import 'pages/gestion_donnees_page.dart';
 import 'theme/app_theme.dart';
+import 'di/app_module.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Commenté temporairement pour le débogage
-  // await AppModule.init();
+  await AppModule.init();
   runApp(
     const ProviderScope(
       child: MyApp(),

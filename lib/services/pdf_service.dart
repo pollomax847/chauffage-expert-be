@@ -323,22 +323,43 @@ class PDFService {
 
   static Future<pw.Document> genererRapportThermiquePDF({
     required List<Radiateur> radiateurs,
+    required List<double>
+        besoinsThermiques, // Ajout: besoin thermique pour chaque radiateur
+    required List<String>
+        materiauxTuyauterie, // Ajout: matériau de tuyauterie pour chaque radiateur
+    required List<String>
+        identifications, // Ajout: identification pour chaque radiateur
+    required List<String?> modeles, // Ajout: modèle pour chaque radiateur
     required Map<String, String> entreprise,
     required Map<String, String> client,
   }) async {
-    final rapportGlobal =
-        AnalyseThermiqueService.genererRapportGlobal(radiateurs);
+    // Vérification que les listes ont la même taille
+    if (radiateurs.length != besoinsThermiques.length ||
+        radiateurs.length != materiauxTuyauterie.length ||
+        radiateurs.length != identifications.length ||
+        radiateurs.length != modeles.length) {
+      throw ArgumentError('Toutes les listes doivent avoir la même longueur');
+    }
+
+    final rapportGlobal = AnalyseThermiqueService.genererRapportGlobal(
+      radiateurs,
+      besoinsThermiques,
+      materiauxTuyauterie,
+      identifications,
+      modeles,
+    );
     final synthese = rapportGlobal['synthese'] as Map<String, dynamic>;
     final pdf = pw.Document();
 
     // Convertir les radiateurs en appareils pour les calculs hydrauliques
-    final appareils = radiateurs
-        .map((r) => Appareil(
-              nom: "${r.modele} - ${r.identification}",
-              uniteDebit: r.puissance / 1000, // Conversion en kW
-              quantite: 1,
-            ))
-        .toList();
+    final appareils = List.generate(
+      radiateurs.length,
+      (index) => Appareil(
+        nom: "${modeles[index] ?? 'Non spécifié'} - ${identifications[index]}",
+        uniteDebit: radiateurs[index].puissance / 1000, // Conversion en kW
+        quantite: 1,
+      ),
+    );
 
     pdf.addPage(
       pw.MultiPage(

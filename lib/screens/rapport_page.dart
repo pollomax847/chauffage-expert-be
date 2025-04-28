@@ -51,16 +51,27 @@ class RapportPage extends ConsumerWidget {
                     ElevatedButton(
                       onPressed: () async {
                         try {
-                          final file = await BEPDFService.generateBEStudyPDF(
-                            clientName: 'Client Test',
-                            entrepriseName: 'Entreprise Test',
-                            moduleName: 'Module Test',
-                            results: {
-                              'Résultat 1': 'Valeur 1',
-                              'Résultat 2': 'Valeur 2',
+                          final file = await BEPdfService.generateBEPDF(
+                            resultats: {
+                              'Client': 'Client Test',
+                              'Entreprise': 'Entreprise Test',
+                              'Module': 'Module Test',
+                              'Résultats': {
+                                'Résultat 1': 'Valeur 1',
+                                'Résultat 2': 'Valeur 2',
+                              },
                             },
+                            typeBE: 'Étude Thermique',
                           );
-                          // TODO: Afficher le PDF ou partager le fichier
+
+                          // Afficher le fichier généré
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Rapport généré: ${file.path}')),
+                          );
+
+                          // Partager le fichier
+                          await BEPdfService.sharePDF(file);
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Erreur: $e')),
