@@ -1,0 +1,10 @@
+{
+  "providers": [
+    {
+      "title": "Ollama - Llama3",
+      "provider": "ollama",
+      "model": "llama3:latest",
+      "baseUrl": "http://localhost:11434"
+    }
+  ]
+}
