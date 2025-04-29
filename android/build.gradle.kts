@@ -22,7 +22,7 @@ tasks.register<Delete>("clean") {
 
 tasks.register("checkSdkLicenses") {
     doLast {
-        val sdkManager = File(System.getenv("ANDROID_HOME") ?: "/usr/lib/android-sdk", "tools/bin/sdkmanager")
+        val sdkManager = File(System.getenv("ANDROID_HOME") ?: "/usr/lib/android-sdk", "cmdline-tools/latest/bin/sdkmanager")
         if (!sdkManager.exists()) {
             throw GradleException("SDK Manager not found. Please ensure ANDROID_HOME is set correctly.")
         }
