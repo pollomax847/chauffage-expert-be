@@ -12,8 +12,14 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
+    plugins.withType<org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin> {
+        kotlin {
+            jvmToolchain(11) // Ensure JVM target compatibility with Java 11
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
