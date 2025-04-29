@@ -19,3 +19,19 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+tasks.register("checkSdkLicenses") {
+    doLast {
+        val sdkManager = File(System.getenv("ANDROID_HOME") ?: "/usr/lib/android-sdk", "tools/bin/sdkmanager")
+        if (!sdkManager.exists()) {
+            throw GradleException("SDK Manager not found. Please ensure ANDROID_HOME is set correctly.")
+        }
+        exec {
+            commandLine(sdkManager.absolutePath, "--licenses")
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn("checkSdkLicenses")
+}

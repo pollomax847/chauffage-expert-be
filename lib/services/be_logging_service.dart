@@ -26,7 +26,7 @@ ${_formatMap(resultats)}
 
       await File(logFile).writeAsString(logEntry, mode: FileMode.append);
     } catch (e) {
-      print('Erreur lors de l\'enregistrement du log: $e');
+      // Handle error appropriately
     }
   }
 
@@ -41,7 +41,7 @@ Message: $erreur
 
       await File(logFile).writeAsString(logEntry, mode: FileMode.append);
     } catch (e) {
-      print('Erreur lors de l\'enregistrement de l\'erreur: $e');
+      // Handle error appropriately
     }
   }
 
@@ -74,7 +74,7 @@ Message: $erreur
       final lines = await file.readAsLines();
       return limit != null ? lines.take(limit).toList() : lines;
     } catch (e) {
-      print('Erreur lors de la lecture des logs: $e');
+      // Handle error appropriately
       return [];
     }
   }
@@ -87,7 +87,7 @@ Message: $erreur
         await file.writeAsString('');
       }
     } catch (e) {
-      print('Erreur lors de la suppression des logs: $e');
+      // Handle error appropriately
     }
   }
 }

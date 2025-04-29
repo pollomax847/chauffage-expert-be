@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/be_pdf_service.dart';
+import 'package:be_chauffage_expert/services/be_pdf_service.dart';
 
 class RapportPage extends ConsumerWidget {
   const RapportPage({super.key});
@@ -51,7 +51,7 @@ class RapportPage extends ConsumerWidget {
                     ElevatedButton(
                       onPressed: () async {
                         try {
-                          final file = await BEPDFService.generateBEStudyPDF(
+                          await BEPDFService.generateBEStudyPDF(
                             clientName: 'Client Test',
                             entrepriseName: 'Entreprise Test',
                             moduleName: 'Module Test',

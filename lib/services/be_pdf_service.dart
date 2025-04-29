@@ -1,3 +1,4 @@
+// services/be_pdf_service.dart
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -32,7 +33,7 @@ class BEPdfService {
             pw.SizedBox(height: 20),
             pw.Text('Type de calcul: $typeCalcul'),
             pw.SizedBox(height: 20),
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: ['Paramètre', 'Valeur'],
               data: resultats.entries
                   .map((e) => [e.key, e.value.toString()])
@@ -144,7 +145,7 @@ class BEPdfService {
             pw.Text('Entreprise: ${entreprise['nom']}'),
             pw.Text('Client: ${client['nom']}'),
             pw.SizedBox(height: 20),
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: [
                 'Radiateur',
                 'Besoin Thermique',

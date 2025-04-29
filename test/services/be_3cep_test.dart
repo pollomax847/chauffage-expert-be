@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart'; // Ajout pour les mocks
-import 'package:be_chauffage_expert/services/be_3cep.dart';
-import 'package:be_chauffage_expert/services/be_security_service.dart'; // Ajout pour gérer la dépendance
+import 'package:be_chauffage_expert/services/be_3cep.dart'; // Ensure this file exists
+import 'package:be_chauffage_expert/services/be_security_service.dart'; // Ensure this file exists
 
 // Mock pour BESecurityService
 class MockBESecurityService extends Mock implements BESecurityService {}

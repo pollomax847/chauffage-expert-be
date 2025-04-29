@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/paulceline/Projets/Be_chauffage_expert/linux"
+    "cmake.sourceDirectory": "/home/paulceline/Projets/Be_chauffage_expert/linux",
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

@@ -6,13 +6,17 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const baseColor = Colors.black;
+    final color = baseColor.withValues(
+        255, baseColor.red, baseColor.green, baseColor.blue);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: color,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
