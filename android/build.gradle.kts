@@ -16,7 +16,7 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
     plugins.withType<org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin> {
-        kotlin {
+        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension>("kotlin") {
             jvmToolchain(11) // Ensure JVM target compatibility with Java 11
         }
     }

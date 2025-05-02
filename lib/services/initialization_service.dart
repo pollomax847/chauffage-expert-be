@@ -1,3 +1,4 @@
+// services/initialization_service.dart
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_it/get_it.dart';
 import 'client_db.dart';
@@ -7,35 +8,65 @@ import 'configuration_service.dart';
 import 'be_security_service.dart';
 import 'interfaces/i_pdf_service.dart';
 
+/// Service d'initialisation qui configure toutes les dépendances
+/// de l'application au démarrage
 class InitializationService {
   static final GetIt _getIt = GetIt.instance;
 
+  /// Vérifie si les dépendances requises sont disponibles
+  static bool _checkDependencies() {
+    try {
+      _getIt<SharedPreferences>();
+      _getIt<ConfigurationService>();
+      _getIt<IPdfService>();
+      _getIt<ClientDbService>();
+      _getIt<BELogic>();
+      return true;
+    } catch (e) {
+      print('Dépendances manquantes: $e');
+      return false;
+    }
+  }
+
   static Future<void> initialize() async {
     try {
+      // Vérifier les dépendances
+      if (!_checkDependencies()) {
+        throw Exception('Dépendances manquantes');
+      }
+
       // Initialiser les préférences partagées
       final prefs = await SharedPreferences.getInstance();
 
       // Enregistrer les services dans GetIt
-      _getIt.registerSingleton<SharedPreferences>(prefs);
+      if (!_getIt.isRegistered<SharedPreferences>()) {
+        _getIt.registerSingleton<SharedPreferences>(prefs);
+      }
 
       // Configuration service doit être initialisé en premier
-      final configService = ConfigurationService(prefs);
-      await configService.init();
-      _getIt.registerSingleton<ConfigurationService>(configService);
+      if (!_getIt.isRegistered<ConfigurationService>()) {
+        final configService = ConfigurationService(prefs);
+        _getIt.registerSingleton<ConfigurationService>(configService);
+      }
 
       // Initialiser la base de données client
-      final clientDb = ClientDbService();
-      await clientDb.initialize();
-      _getIt.registerSingleton<ClientDbService>(clientDb);
+      if (!_getIt.isRegistered<ClientDbService>()) {
+        final clientDb = ClientDbService();
+        _getIt.registerSingleton<ClientDbService>(clientDb);
+      }
 
       // Initialiser le service PDF
-      final pdfService = BEPdfService(prefs);
-      await pdfService.initialize();
-      _getIt.registerSingleton<IPdfService>(pdfService);
+      if (!_getIt.isRegistered<IPdfService>()) {
+        final pdfService = BEPdfService(prefs);
+        await pdfService.initialize();
+        _getIt.registerSingleton<IPdfService>(pdfService);
+      }
 
       // Initialiser le service de logique métier
-      final logicService = BELogic();
-      _getIt.registerSingleton<BELogic>(logicService);
+      if (!_getIt.isRegistered<BELogic>()) {
+        final logicService = BELogic();
+        _getIt.registerSingleton<BELogic>(logicService);
+      }
 
       // Enregistrer les événements de démarrage
       await BESecurityService.logSecurityEvent(
@@ -48,26 +79,23 @@ class InitializationService {
       await _initializeTheme();
       await _prepareLocalStorage();
     } catch (e, stackTrace) {
-      await BESecurityService.logSecurityEvent(
-        'erreur_initialisation',
-        'Erreur lors de l\'initialisation: $e\n$stackTrace',
-      );
+      print('Erreur lors de l\'initialisation: $e\n$stackTrace');
       rethrow;
     }
   }
 
   /// Initialise les providers Riverpod
   static Future<void> _initializeProviders() async {
-    // Configuration des providers
+    // TODO: Initialiser les providers
   }
 
   /// Configure le thème de l'application selon les préférences
   static Future<void> _initializeTheme() async {
-    // Initialisation du thème
+    // TODO: Initialiser le thème
   }
 
   /// Prépare le stockage local
   static Future<void> _prepareLocalStorage() async {
-    // Préparation des bases de données locales
+    // TODO: Préparer le stockage local
   }
 }

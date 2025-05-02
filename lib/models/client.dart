@@ -1,55 +1,60 @@
+// models/client.dart
+import 'package:uuid/uuid.dart';
+
 class Client {
   final String id;
   final String nom;
   final String prenom;
-  final String adresse;
-  final String ville;
-  final String codePostal;
-  final String telephone;
-  final String email;
-  final List<String> interventions;
-  final Map<String, dynamic> preferences;
+  final String? email;
+  final String? telephone;
+  final String? adresse;
+  final String? ville;
+  final String? codePostal;
+  final DateTime dateCreation;
+  final DateTime derniereMaj;
 
   Client({
-    required this.id,
+    String? id,
     required this.nom,
     required this.prenom,
-    required this.adresse,
-    required this.ville,
-    required this.codePostal,
-    required this.telephone,
-    required this.email,
-    this.interventions = const [],
-    this.preferences = const {},
-  });
+    this.email,
+    this.telephone,
+    this.adresse,
+    this.ville,
+    this.codePostal,
+    DateTime? dateCreation,
+    DateTime? derniereMaj,
+  })  : id = id ?? const Uuid().v4(),
+        dateCreation = dateCreation ?? DateTime.now(),
+        derniereMaj = derniereMaj ?? DateTime.now();
 
-  factory Client.fromJson(Map<String, dynamic> json) {
-    return Client(
-      id: json['id'] ?? '',
-      nom: json['nom'] ?? '',
-      prenom: json['prenom'] ?? '',
-      adresse: json['adresse'] ?? '',
-      ville: json['ville'] ?? '',
-      codePostal: json['code_postal'] ?? '',
-      telephone: json['telephone'] ?? '',
-      email: json['email'] ?? '',
-      interventions: List<String>.from(json['interventions'] ?? []),
-      preferences: json['preferences'] ?? {},
-    );
-  }
-
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'nom': nom,
       'prenom': prenom,
+      'email': email,
+      'telephone': telephone,
       'adresse': adresse,
       'ville': ville,
-      'code_postal': codePostal,
-      'telephone': telephone,
-      'email': email,
-      'interventions': interventions,
-      'preferences': preferences,
+      'codePostal': codePostal,
+      'dateCreation': dateCreation.toIso8601String(),
+      'derniereMaj': derniereMaj.toIso8601String(),
     };
+  }
+
+  factory Client.fromMap(Map<String, dynamic> map) {
+    return Client(
+      id: map['id'],
+      nom: map['nom'],
+      prenom: map['prenom'],
+      email: map['email'],
+      telephone: map['telephone'],
+      adresse: map['adresse'],
+      ville: map['ville'],
+      codePostal: map['codePostal'],
+      dateCreation: DateTime.parse(map['dateCreation']),
+      derniereMaj: DateTime.parse(map['derniereMaj']),
+    );
   }
 }
