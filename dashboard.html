@@ -639,25 +639,64 @@
 
         // Modification de la fonction updateDashboard
         function updateDashboard() {
-            if (isOffline) {
-                // Utiliser les données locales
-                const mockData = generateMockData();
-                updateCharts(mockData);
-                updateMetrics(mockData);
-            } else {
-                // Mode en ligne normal
-                fetch('/api/monitoring')
-                    .then(response => response.json())
-                    .then(data => {
-                        localData = data;
-                        updateCharts(data);
-                        updateMetrics(data);
+            if (!isOffline) {
+                // Récupération des données depuis l'API
+                fetch('https://api.example.com/dashboard/metrics')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erreur réseau');
+                        }
+                        return response.json();
                     })
-                    .catch(() => {
-                        // En cas d'erreur de connexion, basculer automatiquement en mode hors ligne
-                        isOffline = true;
-                        toggleOfflineMode();
+                    .then(data => {
+                        // Mise à jour des métriques
+                        updateMetrics(data);
+                        
+                        // Mise à jour des graphiques
+                        updateCharts(data);
+                        
+                        // Mise à jour du statut de récupération
+                        updateRecoveryStatus(data.recovery);
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la récupération des données:', error);
+
+                        // Essayer de charger les données locales si disponibles
+                        const localDataStr = localStorage.getItem('monitoringData');
+                        if (localDataStr) {
+                            try {
+                                const localData = JSON.parse(localDataStr);
+                                updateMetrics(localData);
+                                updateCharts(localData);
+                                updateRecoveryStatus(localData.recovery);
+                                console.log('Données locales chargées.');
+                            } catch (e) {
+                                console.error('Erreur lors du chargement des données locales:', e);
+                            }
+                        }
+
+                        // S'assurer que le mode hors ligne est activé visuellement si ce n'est pas déjà le cas
+                        if (!isOffline) {
+                            isOffline = true;
+                            toggleOfflineMode(); // Met à jour l'UI et potentiellement sauvegarde les données actuelles (si nécessaire)
+                        }
                     });
+            } else {
+                 // Si déjà en mode hors ligne, essayer de charger les données locales
+                 const localDataStr = localStorage.getItem('monitoringData');
+                 if (localDataStr) {
+                     try {
+                         const localData = JSON.parse(localDataStr);
+                         updateMetrics(localData);
+                         updateCharts(localData);
+                         updateRecoveryStatus(localData.recovery);
+                         console.log('Données locales chargées (mode hors ligne).');
+                     } catch (e) {
+                         console.error('Erreur lors du chargement des données locales (mode hors ligne):', e);
+                     }
+                 } else {
+                     console.log('Aucune donnée locale disponible en mode hors ligne.');
+                 }
             }
         }
 
@@ -920,7 +959,6 @@
             loadPreferences();
             applyTheme();
             updateWelcomeMessage();
-            // ... existing load event code ...
         });
 
         function updateFontPreview() {

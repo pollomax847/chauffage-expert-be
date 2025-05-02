@@ -40,7 +40,7 @@ run_load_test() {
                 response=$(curl -s -w "%{http_code}" -o /dev/null "https://$DOMAIN/api/$endpoint")
                 request_count=$((request_count + 1))
                 
-                if [ "$response" != "200" ]; then
+                if [ "$response" != "200" ] && [ "$response" != "304" ]; then
                     error_count=$((error_count + 1))
                     log "Erreur sur $endpoint: $response"
                 fi
@@ -74,7 +74,7 @@ trigger_recovery() {
     
     # 1. Sauvegarde de l'état actuel
     log "Sauvegarde de l'état actuel..."
-    ./monitor.sh create_backup
+    ./scripts/monitor.sh create_backup
     
     # 2. Vérification des ressources
     log "Vérification des ressources..."
@@ -94,21 +94,33 @@ check_resources() {
     # Vérification de la mémoire
     memory_usage=$(free -m | awk '/Mem:/ {print $3/$2 * 100.0}')
     if (( $(echo "$memory_usage > 90" | bc -l) )); then
-        log "Nettoyage de la mémoire..."
-        sync
-        echo 3 > /proc/sys/vm/drop_caches
+        log "ALERTE: Utilisation mémoire élevée: ${memory_usage}%"
+        # Libérer de la mémoire en redémarrant les services
+        restart_services
     fi
-    
+
+    # Vérification de l'espace disque
+    disk_usage=$(df -h / | awk 'NR==2 {print $5}' | tr -d '%')
+    if [ "$disk_usage" -gt 85 ]; then
+        log "ALERTE: Espace disque faible: ${disk_usage}%"
+        # Nettoyage des fichiers temporaires
+        clean_temp_files
+    fi
+
     # Vérification du CPU
-    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}')
+    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}') # User + System CPU
     if (( $(echo "$cpu_usage > 90" | bc -l) )); then
+        log "ALERTE: Utilisation CPU élevée: ${cpu_usage}%"
         log "Optimisation du CPU..."
-        # Ajouter des actions spécifiques ici
+        # Ajouter des actions spécifiques ici (ex: identifier et killer les processus gourmands)
+        # pkill -f "processus_gourmand"
     fi
 }
 
 # Fonction de redémarrage des services
 restart_services() {
+    # TODO: Envisager un redémarrage plus ciblé si possible,
+    # en fonction du type de problème détecté.
     # Redémarrage du serveur web
     log "Redémarrage du serveur web..."
     systemctl restart nginx
@@ -125,7 +137,7 @@ restart_services() {
 verify_recovery() {
     attempts=0
     while [ $attempts -lt $RECOVERY_THRESHOLD ]; do
-        if ./monitor.sh test_deployment; then
+        if ./scripts/monitor.sh test_deployment; then
             log "Récupération réussie !"
             return 0
         fi
@@ -145,4 +157,4 @@ main() {
 }
 
 # Exécution
-main 
+main

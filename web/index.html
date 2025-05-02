@@ -10,6 +10,7 @@
 
     <!-- iOS meta tags & icons -->
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Chauffage Expert">
     <link rel="apple-touch-icon" href="icons/Icon-192.png">
@@ -47,6 +48,10 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        #error-message {
+            color: red;
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -54,30 +59,39 @@
     <div id="loading" class="loading">
         <div class="spinner"></div>
         <p>Chargement de l'application...</p>
+        <div id="error-message"></div>
     </div>
     <script>
-        window.addEventListener('load', async function () {
-            try {
-                // Initialize Flutter
-                await _flutter.loader.load();
+        function showError(message) {
+            console.error(message);
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerHTML = message;
+            errorDiv.style.display = 'block';
+        }
 
-                // Download main.dart.js
-                const entrypoint = await _flutter.loader.load({
+        window.addEventListener('load', function () {
+            console.log('Page loaded, initializing Flutter...');
+            
+            try {
+                _flutter.loader.load({
                     serviceWorker: {
                         serviceWorkerVersion: serviceWorkerVersion,
+                    },
+                    onEntrypointLoaded: function(engineInitializer) {
+                        console.log('Flutter engine initializer loaded');
+                        engineInitializer.initializeEngine().then(function(appRunner) {
+                            console.log('Flutter engine initialized');
+                            appRunner.runApp();
+                            document.getElementById('loading').style.display = 'none';
+                        }).catch(function(error) {
+                            showError('Erreur lors de l\'initialisation de Flutter: ' + error);
+                            console.error('Error initializing Flutter:', error);
+                        });
                     }
                 });
-
-                // Initialize the app
-                await entrypoint.initializeEngine();
-                await entrypoint.runApp();
-
-                // Hide loading screen when app is ready
-                document.getElementById('loading').style.display = 'none';
             } catch (error) {
-                console.error('Error loading Flutter application:', error);
-                document.getElementById('loading').innerHTML = 
-                    '<p style="color: red;">Erreur de chargement. Veuillez rafraîchir la page.</p>';
+                showError('Erreur lors du chargement de Flutter: ' + error);
+                console.error('Error loading Flutter:', error);
             }
         });
     </script>

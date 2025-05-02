@@ -1,3 +1,4 @@
+<!-- TODO: Contenu à fusionner dans le guide utilisateur principal (user-guide.md ou GUIDE_UTILISATION.md) et supprimer ce fichier. -->
 # Guide d'Utilisation
 
 ## Installation
@@ -35,4 +36,4 @@
 
 1. Sélectionner une étude
 2. Cliquer sur "Générer PDF"
-3. Le rapport est généré et peut être partagé 
+3. Le rapport est généré et peut être partagé

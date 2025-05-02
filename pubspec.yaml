@@ -5,6 +5,7 @@ version: 1.0.0+1
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
+  flutter: ">=3.16.0"  # Ajout de la version minimale de Flutter
 
 dependencies:
   flutter:
@@ -28,6 +29,7 @@ dependencies:
   flutter_riverpod: ^2.4.9
   provider: ^6.1.1
   get_it: ^7.6.7
+  riverpod_annotation: ^2.3.3  # Ajout pour le support des annotations Riverpod
   
   # Storage
   shared_preferences: ^2.2.2
@@ -35,6 +37,7 @@ dependencies:
   hive_flutter: ^1.1.0
   path_provider: ^2.1.2
   path_provider_platform_interface: ^2.0.6
+  sqflite: ^2.3.2  # Ajout pour le support SQLite
   
   # Network
   http: ^1.1.2
@@ -48,12 +51,14 @@ dependencies:
   json_annotation: ^4.8.1
   freezed_annotation: ^2.4.1
   
-  # PDF
+  # PDF & Documents
   pdf: ^3.10.8
   printing: ^5.11.1
   syncfusion_flutter_pdf: ^24.1.41
   syncfusion_flutter_pdfviewer: ^24.1.41
   syncfusion_flutter_core: ^24.1.41
+  pdf_render: ^1.4.3  # Ajout pour le rendu PDF natif
+  open_file: ^3.3.2  # Ajout pour l'ouverture des fichiers
   
   # Excel
   excel: ^3.0.0
@@ -74,6 +79,15 @@ dependencies:
   path: ^1.8.3
 
   crypto: any
+  
+  # Security
+  flutter_secure_storage: ^9.0.0  # Ajout pour le stockage sécurisé
+  
+  # Analytics & Monitoring
+  firebase_core: ^2.24.2  # Ajout pour Firebase
+  firebase_analytics: ^10.8.0
+  firebase_crashlytics: ^3.4.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -87,6 +101,9 @@ dev_dependencies:
   freezed: ^2.4.1
   test: ^1.24.9
   mocktail: ^1.0.3
+  riverpod_generator: ^2.3.9  # Ajout pour la génération de code Riverpod
+  flutter_launcher_icons: ^0.13.1  # Ajout pour la gestion des icônes
+  flutter_native_splash: ^2.3.10  # Déplacé des dependencies aux dev_dependencies
 
 flutter:
   uses-material-design: true
@@ -94,4 +111,12 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-    - web/icons/ 
+    - web/icons/
+
+  # Ajout de la configuration des polices
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700

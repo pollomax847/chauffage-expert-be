@@ -1,30 +1,59 @@
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:get_it/get_it.dart';
 import 'client_db.dart';
-import 'be_pdf_service.dart'; // This file now contains the definition of BEPdfService
+import 'be_pdf_service.dart';
 import 'be_logic.dart';
 import 'configuration_service.dart';
+import 'be_security_service.dart';
+import 'interfaces/i_pdf_service.dart';
 
-/// Service d'initialisation qui configure toutes les dépendances
-/// de l'application au démarrage
 class InitializationService {
+  static final GetIt _getIt = GetIt.instance;
+
   static Future<void> initialize() async {
-    // Initialiser les préférences partagées
-    final prefs = await SharedPreferences.getInstance();
+    try {
+      // Initialiser les préférences partagées
+      final prefs = await SharedPreferences.getInstance();
 
-    // Initialiser les services
-    final configurationService = ConfigurationService(prefs);
-    final clientDb = ClientDbService();
-    final pdfService = BEPdfService(); // Ensure BEPdfService is defined in the imported file
-    final logicService = BELogic();
+      // Enregistrer les services dans GetIt
+      _getIt.registerSingleton<SharedPreferences>(prefs);
 
-    // Enregistrer les événements de démarrage
-    print('Application initialisée avec succès');
+      // Configuration service doit être initialisé en premier
+      final configService = ConfigurationService(prefs);
+      await configService.init();
+      _getIt.registerSingleton<ConfigurationService>(configService);
 
-    // Initialisation des autres composants
-    await _initializeProviders();
-    await _initializeTheme();
-    await _prepareLocalStorage();
+      // Initialiser la base de données client
+      final clientDb = ClientDbService();
+      await clientDb.initialize();
+      _getIt.registerSingleton<ClientDbService>(clientDb);
+
+      // Initialiser le service PDF
+      final pdfService = BEPdfService(prefs);
+      await pdfService.initialize();
+      _getIt.registerSingleton<IPdfService>(pdfService);
+
+      // Initialiser le service de logique métier
+      final logicService = BELogic();
+      _getIt.registerSingleton<BELogic>(logicService);
+
+      // Enregistrer les événements de démarrage
+      await BESecurityService.logSecurityEvent(
+        'initialisation',
+        'Application initialisée avec succès',
+      );
+
+      // Initialisation des autres composants
+      await _initializeProviders();
+      await _initializeTheme();
+      await _prepareLocalStorage();
+    } catch (e, stackTrace) {
+      await BESecurityService.logSecurityEvent(
+        'erreur_initialisation',
+        'Erreur lors de l\'initialisation: $e\n$stackTrace',
+      );
+      rethrow;
+    }
   }
 
   /// Initialise les providers Riverpod

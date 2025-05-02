@@ -27,25 +27,26 @@ Application professionnelle pour les techniciens chauffagistes et bureaux d'étu
 ## Installation
 
 1. Cloner le dépôt :
-```bash
-git clone https://github.com/votre-username/chauffage_expert.git
-cd chauffage_expert
-```
+   ```bash
+   git clone https://github.com/votre-username/chauffage_expert.git
+   cd chauffage_expert
+   ```
 
 2. Installer les dépendances :
-```bash
-flutter pub get
-```
+   ```bash
+   flutter pub get
+   ```
 
-3. Générer les fichiers de code :
-```bash
-flutter pub run build_runner build --delete-conflicting-outputs
-```
+3. Générer les fichiers de code (si nécessaire) :
+   <!-- TODO: Clarifier quand cette étape est nécessaire (ex: après modification des modèles annotés). -->
+   ```bash
+   flutter pub run build_runner build --delete-conflicting-outputs
+   ```
 
 4. Lancer l'application :
-```bash
-flutter run
-```
+   ```bash
+   flutter run
+   ```
 
 ## Structure du projet
 
@@ -56,15 +57,17 @@ flutter run
 ├── docs/             # Documentation
 │   ├── installation.md
 │   ├── tutorial.md
-│   ├── user-guide.md
+│   ├── GUIDE_UTILISATION.md # Guide utilisateur principal
 │   └── technical-docs.md
 ├── features/         # Fonctionnalités de l'application
 ├── lib/              # Code source principal
 ├── logs/             # Fichiers de logs
 ├── scripts/          # Scripts utilitaires
-│   ├── build_web.sh
-│   ├── deploy.sh
-│   └── rotate_logs.sh
+│   ├── monitor.sh
+│   ├── load_test.sh
+│   ├── build_web.sh  # (Exemple, si existant)
+│   ├── deploy.sh     # (Exemple, si existant)
+│   └── rotate_logs.sh # (Exemple, si existant)
 ├── tests/            # Tests et fichiers de test
 └── web/              # Configuration web
 ```
@@ -106,4 +109,4 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 Votre Nom - [@votre_twitter](https://twitter.com/votre_twitter) - email@example.com
 
-Lien du projet : [https://github.com/votre-username/chauffage_expert](https://github.com/votre-username/chauffage_expert) 
+Lien du projet : [https://github.com/votre-username/chauffage_expert](https://github.com/votre-username/chauffage_expert)

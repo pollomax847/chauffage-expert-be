@@ -1,81 +1,53 @@
-// services/be_pdf_service.dart
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:intl/intl.dart';
-import '../models/radiateur.dart';
-import '../services/analyse_thermique_service.dart';
+import '../models/rapport.dart';
+import './interfaces/i_pdf_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class BEPdfService {
-  // Méthodes pour générer des PDFs
-  static Future<File> generateDimensionnementPDF({
-    required Map<String, dynamic> resultats,
-    required String typeCalcul,
-    Map<String, String>? entete,
-    Map<String, String>? piedPage,
-    bool showPreview = false,
-  }) async {
-    // Implémentation de la méthode pour générer un PDF de dimensionnement
-    final pdf = pw.Document();
+class BEPdfService implements IPdfService {
+  final List<Rapport> _reports = [];
+  late final String _basePath;
+  static const _reportsKey = 'pdf_reports';
+  final SharedPreferences _prefs;
 
-    pdf.addPage(
-      pw.Page(
-        build: (context) => pw.Column(
-          children: [
-            if (entete != null)
-              pw.Text(
-                entete['titre'] ?? '',
-                style:
-                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-              ),
-            pw.SizedBox(height: 20),
-            pw.Text('Type de calcul: $typeCalcul'),
-            pw.SizedBox(height: 20),
-            pw.TableHelper.fromTextArray(
-              headers: ['Paramètre', 'Valeur'],
-              data: resultats.entries
-                  .map((e) => [e.key, e.value.toString()])
-                  .toList(),
-            ),
-            if (piedPage != null)
-              pw.Text(
-                piedPage['texte'] ?? '',
-                style: const pw.TextStyle(fontSize: 12),
-              ),
-          ],
-        ),
-      ),
-    );
+  BEPdfService(this._prefs);
 
-    final output = await getTemporaryDirectory();
-    final file = File('${output.path}/dimensionnement_$typeCalcul.pdf');
-    await file.writeAsBytes(await pdf.save());
-    return file;
+  @override
+  Future<void> initialize() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    _basePath = '${appDir.path}/rapports';
+    await Directory(_basePath).create(recursive: true);
+    _loadSavedReports();
   }
 
-  static Future<File> generateBEStudyPDF({
+  void _loadSavedReports() {
+    final savedReports = _prefs.getStringList(_reportsKey) ?? [];
+    _reports.clear();
+    for (final reportJson in savedReports) {
+      try {
+        _reports.add(Rapport.fromJson(
+            Map<String, dynamic>.from(Map.from(reportJson as Map))));
+      } catch (e) {
+        print('Erreur lors du chargement du rapport: $e');
+      }
+    }
+  }
+
+  void _saveReports() {
+    final reportsJson = _reports.map((r) => r.toJson()).toList();
+    _prefs.setStringList(
+        _reportsKey, reportsJson.map((r) => r.toString()).toList());
+  }
+
+  @override
+  Future<Rapport> generateBEStudyPDF({
     required String clientName,
     required String entrepriseName,
     required String moduleName,
     required Map<String, dynamic> results,
   }) async {
-    return generateDimensionnementPDF(
-      resultats: {
-        'Client': clientName,
-        'Entreprise': entrepriseName,
-        'Module': moduleName,
-        'Résultats': results,
-      },
-      typeCalcul: 'Étude $moduleName',
-    );
-  }
-
-  static Future<File> generateBEPDF({
-    required Map<String, dynamic> resultats,
-    required String typeBE,
-  }) async {
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -83,170 +55,60 @@ class BEPdfService {
         build: (context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text(
-              'Bureau d\'Étude - $typeBE',
-              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-            ),
+            pw.Text('Rapport Technique', style: const pw.TextStyle(fontSize: 24)),
             pw.SizedBox(height: 20),
-            _buildResultsSection(resultats),
+            pw.Text('Client: $clientName'),
+            pw.Text('Entreprise: $entrepriseName'),
+            pw.Text('Module: $moduleName'),
             pw.SizedBox(height: 20),
-            pw.Text(
-              'Généré le ${DateFormat('dd/MM/yyyy à HH:mm').format(DateTime.now())}',
-              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
-            ),
+            pw.Text('Résultats:', style: const pw.TextStyle(fontSize: 18)),
+            ...results.entries.map((e) => pw.Text('${e.key}: ${e.value}')),
           ],
         ),
       ),
     );
 
-    final output = await getTemporaryDirectory();
-    final file = File('${output.path}/be_$typeBE.pdf');
+    final rapport = Rapport(
+      clientName: clientName,
+      entrepriseName: entrepriseName,
+      moduleName: moduleName,
+      results: results,
+    );
+
+    final file = File('$_basePath/${rapport.id}.pdf');
     await file.writeAsBytes(await pdf.save());
+
+    final rapportWithPath = Rapport(
+      id: rapport.id,
+      clientName: rapport.clientName,
+      entrepriseName: rapport.entrepriseName,
+      moduleName: rapport.moduleName,
+      results: rapport.results,
+      createdAt: rapport.createdAt,
+      filePath: file.path,
+    );
+
+    _reports.add(rapportWithPath);
+    _saveReports();
+
+    return rapportWithPath;
+  }
+
+  @override
+  List<Rapport> getReports() => List.unmodifiable(_reports);
+
+  @override
+  Future<File?> getReportFile(String reportId) async {
+    final rapport = _reports.firstWhere(
+      (r) => r.id == reportId,
+      orElse: () => throw Exception('Rapport non trouvé'),
+    );
+
+    if (rapport.filePath == null) return null;
+
+    final file = File(rapport.filePath!);
+    if (!await file.exists()) return null;
+
     return file;
-  }
-
-  static Future<pw.Document> genererRapportThermiquePDF({
-    required List<Radiateur> radiateurs,
-    required List<double> besoinsThermiques,
-    required List<String> materiauxTuyauterie,
-    required List<String> identifications,
-    required List<String?> modeles,
-    required Map<String, String> entreprise,
-    required Map<String, String> client,
-  }) async {
-    // Vérification que les listes ont la même taille
-    if (radiateurs.length != besoinsThermiques.length ||
-        radiateurs.length != materiauxTuyauterie.length ||
-        radiateurs.length != identifications.length ||
-        radiateurs.length != modeles.length) {
-      throw ArgumentError('Toutes les listes doivent avoir la même longueur');
-    }
-
-    final rapportGlobal = AnalyseThermiqueService.genererRapportGlobal(
-      radiateurs,
-      besoinsThermiques,
-      materiauxTuyauterie,
-      identifications,
-      modeles,
-    );
-
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              'Rapport Thermique',
-              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.SizedBox(height: 20),
-            pw.Text('Entreprise: ${entreprise['nom']}'),
-            pw.Text('Client: ${client['nom']}'),
-            pw.SizedBox(height: 20),
-            pw.TableHelper.fromTextArray(
-              headers: [
-                'Radiateur',
-                'Besoin Thermique',
-                'Matériau Tuyauterie',
-                'Identification',
-                'Modèle'
-              ],
-              data: List.generate(
-                radiateurs.length,
-                (index) => [
-                  radiateurs[index]
-                      .reference, // Utiliser reference au lieu de nom
-                  besoinsThermiques[index].toString(),
-                  materiauxTuyauterie[index],
-                  identifications[index],
-                  modeles[index] ?? 'Non spécifié',
-                ],
-              ),
-            ),
-            pw.SizedBox(height: 20),
-            pw.Text('Synthèse du Rapport:'),
-            _buildResultsSection(
-                rapportGlobal['synthese'] as Map<String, dynamic>),
-          ],
-        ),
-      ),
-    );
-
-    return pdf;
-  }
-
-  static Future<void> sharePDF(File file) async {
-    await Share.shareXFiles([XFile(file.path)],
-        text: 'Rapport Chauffage Expert');
-  }
-
-  static pw.Widget _buildResultsSection(Map<String, dynamic> results) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: results.entries.map((entry) {
-        if (entry.value is Map) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                entry.key,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-              ),
-              pw.SizedBox(height: 5),
-              _buildResultsSection(entry.value as Map<String, dynamic>),
-              pw.SizedBox(height: 10),
-            ],
-          );
-        } else {
-          return pw.Padding(
-            padding: const pw.EdgeInsets.only(bottom: 5),
-            child: pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text(entry.key),
-                pw.Text(entry.value.toString()),
-              ],
-            ),
-          );
-        }
-      }).toList(),
-    );
-  }
-
-  static Future<String> genererRapport({
-    required String module,
-    required Map<String, dynamic> parametres,
-    required Map<String, dynamic> resultats,
-  }) async {
-    // Implementation for generating a PDF report
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              'Rapport - $module',
-              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.SizedBox(height: 20),
-            pw.Text('Paramètres:'),
-            _buildResultsSection(parametres),
-            pw.SizedBox(height: 20),
-            pw.Text('Résultats:'),
-            _buildResultsSection(resultats),
-          ],
-        ),
-      ),
-    );
-
-    final output = await getTemporaryDirectory();
-    final file = File(
-        '${output.path}/rapport_${module.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}.pdf');
-    await file.writeAsBytes(await pdf.save());
-    return file.path;
   }
 }

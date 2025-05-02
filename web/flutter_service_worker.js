@@ -3,6 +3,23 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
+// #############################################################################
+// #  ATTENTION : MAINTENANCE MANUELLE DU SERVICE WORKER                       #
+// #############################################################################
+// # Le contenu de RESOURCES et CORE ci-dessous semble être géré manuellement. #
+// # Le processus de build standard de Flutter (`flutter build web`) génère    #
+// # automatiquement un fichier `flutter_service_worker.js` avec ces listes   #
+// # mises à jour en fonction des assets réels du projet et de leurs hashs.   #
+// #                                                                           #
+// # Modifier ce fichier manuellement est FORTEMENT DÉCONSEILLÉ car :          #
+// # - C'est source d'erreurs (oublis, mauvais hashs).                        #
+// # - Cela casse le mécanisme de mise à jour du cache PWA de Flutter.         #
+// # - Les modifications seront écrasées lors du prochain `flutter build web`. #
+// #                                                                           #
+// # Recommandation : Utiliser le fichier généré par Flutter sans modification.#
+// # Si des modifications sont absolument nécessaires, documentez précisément  #
+// # pourquoi et comment maintenir ce fichier synchronisé avec le build.       #
+// #############################################################################
 const RESOURCES = {"flutter.js": "76f08d47ff9f5715220992f993002504",
 "manifest.json": "1a56247e6ed11ce202235606d3f10bea",
 "assets/fonts/MaterialIcons-Regular.otf": "78e8ab0f35c0e2eb344f5ee4b0c0ee43",
@@ -166,32 +183,27 @@ self.addEventListener('message', (event) => {
 // Download offline will check the RESOURCES for all files not in the cache
 // and populate them.
 async function downloadOffline() {
-  var resources = [];
-  var contentCache = await caches.open(CACHE_NAME);
-  var currentContent = {};
-  for (var request of await contentCache.keys()) {
-    var key = request.url.substring(origin.length + 1);
-    if (key == "") {
-      key = "/";
-    }
-    currentContent[key] = true;
-  }
-  for (var resourceKey of Object.keys(RESOURCES)) {
-    if (!currentContent[resourceKey]) {
-      resources.push(resourceKey);
-    }
-  }
-  return contentCache.addAll(resources);
+  // TODO: Implémenter la logique de téléchargement des ressources pour le mode hors ligne.
+  // 1. Ouvrir le cache TEMP.
+  // 2. Itérer sur RESOURCES.
+  // 3. Pour chaque ressource non présente dans CACHE_NAME, la télécharger.
+  // 4. Stocker les ressources téléchargées dans TEMP.
+  // 5. Une fois terminé, déplacer les ressources de TEMP vers CACHE_NAME.
+  // 6. Nettoyer TEMP.
+  console.log("Fonctionnalité de téléchargement hors ligne non implémentée.");
 }
 // Attempt to download the resource online before falling back to
 // the offline cache.
 function onlineFirst(event) {
   return event.respondWith(
     fetch(event.request).then((response) => {
-      return caches.open(CACHE_NAME).then((cache) => {
-        cache.put(event.request, response.clone());
-        return response;
-      });
+      if (response.status === 200) {  // Vérifier que la réponse est correcte
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+      }
+      return response;  // Retourner la réponse même si elle n'est pas mise en cache
     }).catch((error) => {
       return caches.open(CACHE_NAME).then((cache) => {
         return cache.match(event.request).then((response) => {
