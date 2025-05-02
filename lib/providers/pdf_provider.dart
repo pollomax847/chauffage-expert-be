@@ -23,7 +23,7 @@ class RapportsNotifier extends StateNotifier<List<Rapport>> {
 
   RapportsNotifier(this._pdfService) : super([]) {
     if (_pdfService != null) {
-      state = _pdfService!.getReports();
+      state = _pdfService.getReports();
     }
   }
 

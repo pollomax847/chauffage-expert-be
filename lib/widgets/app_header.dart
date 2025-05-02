@@ -36,7 +36,7 @@ class AppHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 // Supprimer 'const' car l'URL est dynamique
                 radius: 20,
                 backgroundImage: NetworkImage(avatarUrl), // URL dynamique

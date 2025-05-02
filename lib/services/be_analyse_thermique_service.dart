@@ -1,7 +1,5 @@
 // services/be_analyse_thermique_service.dart
-import 'dart:math';
 import '../models/piece.dart';
-import '../models/materiau.dart';
 import './be_calcul_service.dart';
 
 class BEAnalyseThermiqueService {

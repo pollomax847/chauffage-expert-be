@@ -97,13 +97,13 @@ class BEPdfService implements IPdfService {
           build: (context) => pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('Rapport Technique', style: pw.TextStyle(fontSize: 24)),
+              pw.Text('Rapport Technique', style: const pw.TextStyle(fontSize: 24)),
               pw.SizedBox(height: 20),
               pw.Text('Client: $clientName'),
               pw.Text('Entreprise: $entrepriseName'),
               pw.Text('Module: $moduleName'),
               pw.SizedBox(height: 20),
-              pw.Text('Résultats:', style: pw.TextStyle(fontSize: 18)),
+              pw.Text('Résultats:', style: const pw.TextStyle(fontSize: 18)),
               ...results.entries.map((e) => pw.Text('${e.key}: ${e.value}')),
             ],
           ),
@@ -117,7 +117,7 @@ class BEPdfService implements IPdfService {
         results: results,
       );
 
-      final file = File('${_basePath}/${rapport.id}.pdf');
+      final file = File('$_basePath/${rapport.id}.pdf');
       await file.writeAsBytes(await pdf.save());
 
       final rapportWithPath = Rapport(
