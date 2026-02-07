@@ -8,6 +8,17 @@ import 'pages/be_page.dart';
 import 'pages/reglementation_page.dart';
 import 'pages/export_page.dart';
 import 'pages/gestion_donnees_page.dart';
+import 'pages/3cep_page.dart';
+import 'pages/calcul_page.dart';
+import 'pages/chauffage_page.dart';
+import 'pages/collectif_page.dart';
+import 'pages/dashboard_page.dart';
+import 'pages/departitions_page.dart';
+import 'pages/ecs_page.dart';
+import 'pages/euev_page.dart';
+import 'pages/hydraulique_page.dart';
+import 'pages/rapport_page.dart';
+import 'pages/rapport_thermique_page.dart';
 import 'screens/radiateurs_page.dart';
 import 'theme/app_theme.dart';
 import 'di/app_module.dart';
@@ -55,6 +66,50 @@ final _router = GoRouter(
     GoRoute(
       path: '/radiateurs',
       builder: (context, state) => const RadiateursPage(),
+    ),
+    GoRoute(
+      path: '/3cep',
+      builder: (context, state) => const TroisCEPPage(),
+    ),
+    GoRoute(
+      path: '/calcul',
+      builder: (context, state) => const CalculPage(),
+    ),
+    GoRoute(
+      path: '/chauffage',
+      builder: (context, state) => const ChauffagePage(),
+    ),
+    GoRoute(
+      path: '/collectif',
+      builder: (context, state) => const CollectifPage(),
+    ),
+    GoRoute(
+      path: '/dashboard',
+      builder: (context, state) => const DashboardPage(),
+    ),
+    GoRoute(
+      path: '/deperditions',
+      builder: (context, state) => const DepartitionsPage(),
+    ),
+    GoRoute(
+      path: '/ecs',
+      builder: (context, state) => const ECSPage(),
+    ),
+    GoRoute(
+      path: '/euev',
+      builder: (context, state) => const EUEVPage(),
+    ),
+    GoRoute(
+      path: '/hydraulique',
+      builder: (context, state) => const HydrauliquePage(),
+    ),
+    GoRoute(
+      path: '/rapport',
+      builder: (context, state) => const RapportPage(),
+    ),
+    GoRoute(
+      path: '/rapport-thermique',
+      builder: (context, state) => const RapportThermiquePage(),
     ),
   ],
 );
