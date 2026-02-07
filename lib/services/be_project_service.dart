@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'be_security_service.dart';
 
@@ -78,7 +79,7 @@ class BEProjectService {
         'erreur',
         'Erreur lors de la sauvegarde des projets: $e',
       );
-      print('Erreur lors de la sauvegarde des projets: $e');
+      debugPrint('Erreur lors de la sauvegarde des projets: $e');
     }
   }
 
@@ -117,7 +118,7 @@ class BEProjectService {
         'erreur',
         'Erreur lors du chargement des projets: $e',
       );
-      print('Erreur lors du chargement des projets: $e');
+      debugPrint('Erreur lors du chargement des projets: $e');
     }
   }
 

@@ -70,11 +70,11 @@ class BESecurityService {
       await file.writeAsString(logEntry, mode: FileMode.append);
 
       if (kDebugMode) {
-        print('Log: $logEntry');
+        debugPrint('Log: $logEntry');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Erreur lors de la journalisation: $e');
+        debugPrint('Erreur lors de la journalisation: $e');
       }
     }
   }

@@ -95,7 +95,7 @@ class BE3CEP {
 
       // Journalisation de l'opération
       if (kDebugMode) {
-        print('Calcul 3CEP démarré pour: $typeBatiment');
+        debugPrint('Calcul 3CEP démarré pour: $typeBatiment');
       }
 
       // 1. Calcul des déperditions et besoins de chauffage
@@ -139,7 +139,7 @@ class BE3CEP {
       } catch (e) {
         // Ne pas bloquer l'exécution si la journalisation échoue
         if (kDebugMode) {
-          print('Erreur de journalisation: $e');
+          debugPrint('Erreur de journalisation: $e');
         }
       }
 
@@ -429,7 +429,7 @@ class BE3CEP {
       return pdf.path;
     } catch (e) {
       if (kDebugMode) {
-        print('Erreur lors de l\'export PDF: $e');
+        debugPrint('Erreur lors de l\'export PDF: $e');
       }
       await BESecurityService.logSecurityEvent(
           'erreur', 'Échec de l\'export PDF 3CEP: $e');

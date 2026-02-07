@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -22,7 +23,7 @@ class BEPhotoService {
       
       return savedImage.path;
     } catch (e) {
-      print('Erreur lors de la prise de photo: $e');
+      debugPrint('Erreur lors de la prise de photo: $e');
       return null;
     }
   }
@@ -43,7 +44,7 @@ class BEPhotoService {
       
       return savedImage.path;
     } catch (e) {
-      print('Erreur lors de la sélection de photo: $e');
+      debugPrint('Erreur lors de la sélection de photo: $e');
       return null;
     }
   }
@@ -55,7 +56,7 @@ class BEPhotoService {
         await file.delete();
       }
     } catch (e) {
-      print('Erreur lors de la suppression de la photo: $e');
+      debugPrint('Erreur lors de la suppression de la photo: $e');
     }
   }
 
@@ -74,7 +75,7 @@ class BEPhotoService {
           .map((file) => file.path)
           .toList();
     } catch (e) {
-      print('Erreur lors de la récupération des photos: $e');
+      debugPrint('Erreur lors de la récupération des photos: $e');
       return [];
     }
   }
