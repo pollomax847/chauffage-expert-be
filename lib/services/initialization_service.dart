@@ -1,4 +1,5 @@
 // services/initialization_service.dart
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_it/get_it.dart';
 import 'client_db.dart';
@@ -23,7 +24,7 @@ class InitializationService {
       _getIt<BELogic>();
       return true;
     } catch (e) {
-      print('Dépendances manquantes: $e');
+      debugPrint('Dépendances manquantes: $e');
       return false;
     }
   }
@@ -79,7 +80,7 @@ class InitializationService {
       await _initializeTheme();
       await _prepareLocalStorage();
     } catch (e, stackTrace) {
-      print('Erreur lors de l\'initialisation: $e\n$stackTrace');
+      debugPrint('Erreur lors de l\'initialisation: $e\n$stackTrace');
       rethrow;
     }
   }
